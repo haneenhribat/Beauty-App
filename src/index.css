@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+  body { @apply bg-cream font-sans text-ink antialiased; }
+  a, button { @apply transition-colors; }
+  button:focus-visible, a:focus-visible { @apply outline-none ring-2 ring-wine-500 ring-offset-2; }
+}
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+  .section { @apply py-20 sm:py-28; }
+  .navlink { @apply relative text-[13px] font-semibold text-stone-600 after:absolute after:-bottom-2 after:left-1/2 after:h-px after:w-0 after:-translate-x-1/2 after:bg-wine-600 after:transition-all hover:text-wine-700 hover:after:w-full; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold transition duration-300; }
+  .btn-primary { @apply btn bg-wine-700 text-white shadow-lg shadow-wine-700/15 hover:-translate-y-0.5 hover:bg-wine-800 hover:shadow-xl; }
+  .btn-secondary { @apply btn border border-wine-900/10 bg-white text-ink hover:border-wine-300 hover:bg-wine-50; }
+  .eyebrow { @apply inline-flex items-center gap-2 rounded-full border border-wine-200 bg-white/70 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[.16em] text-wine-700; }
+  .orb { @apply pointer-events-none absolute rounded-full blur-3xl; }
+}
+.product { position:relative; display:grid; place-items:center; width:86px; height:150px; color:white; box-shadow:0 24px 35px rgba(50,30,30,.15); transition:transform .4s ease; }
+.group:hover .product { transform:translateY(-5px) rotate(2deg); }
+.product span { font-size:9px; letter-spacing:.24em; font-weight:700; }
+.product-0 { border-radius:12px 12px 26px 26px; background:linear-gradient(145deg,#f4ead7,#a27e56); }
+.product-0:before { content:''; position:absolute; top:-15px; width:40px; height:20px; border-radius:5px; background:#4a1c28; }
+.product-1 { width:55px; height:155px; border-radius:7px; background:linear-gradient(90deg,#6b2837,#a74e61,#5b202e); }
+.product-1:before { content:''; position:absolute; top:-32px; width:45px; height:35px; border-radius:5px; background:#e3d1bd; }
+.product-2 { width:100px; height:140px; border-radius:50px 50px 18px 18px; background:linear-gradient(145deg,#2d2420,#896a3f); }
+.product-2:before { content:''; position:absolute; top:-14px; width:43px; height:20px; border-radius:5px; background:#c8a25a; }
+@media (prefers-reduced-motion: reduce) { html{scroll-behavior:auto} *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important} }
