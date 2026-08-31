@@ -29,6 +29,38 @@ export async function createBooking(values) {
   return data
 }
 
+export async function createBookingFromSelection({ userId, salonSlug, booking, address }) {
+  const client = requireClient()
+  const { data: salon, error: salonError } = await client.from('salons').select('id').eq('slug', salonSlug).single()
+  if (salonError) throw salonError
+  const { data: service, error: serviceError } = await client.from('services').select('id').eq('salon_id', salon.id).eq('name', booking.service.name).single()
+  if (serviceError) throw serviceError
+
+  const appointment = new Date(booking.date.date)
+  const [, hourText, minuteText, meridiem] = booking.time.match(/(\d+):(\d+)\s(AM|PM)/) || []
+  let hour = Number(hourText)
+  if (meridiem === 'PM' && hour !== 12) hour += 12
+  if (meridiem === 'AM' && hour === 12) hour = 0
+  appointment.setHours(hour, Number(minuteText), 0, 0)
+  const home = booking.location === 'home'
+
+  return createBooking({
+    customer_id: userId,
+    salon_id: salon.id,
+    service_id: service.id,
+    specialist_name: booking.specialist?.name || 'No Preference',
+    appointment_at: appointment.toISOString(),
+    location_type: home ? 'home' : 'salon',
+    address: home ? `${address.address}, ${address.city}` : null,
+    location_notes: home ? address.notes || null : null,
+    service_price: booking.service.price,
+    additional_fee: home ? 12 : 0,
+    payment_method: booking.payment,
+    payment_status: 'pending',
+    status: 'confirmed',
+  })
+}
+
 export async function updateBooking(bookingId, values) {
   const { data, error } = await requireClient().from('bookings').update(values).eq('id', bookingId).select().single()
   if (error) throw error
