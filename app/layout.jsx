@@ -1,4 +1,5 @@
 import '../src/index.css'
+import AppProviders from '../src/components/AppProviders.jsx'
 
 export const metadata = {
   title: 'Aura — Beauty, beautifully simple.',
@@ -8,7 +9,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><AppProviders>{children}</AppProviders></body>
     </html>
   )
 }
