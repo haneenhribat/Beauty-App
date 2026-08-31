@@ -8,3 +8,4 @@ sites-dist/
 *.log
 .env*
 !.env.example
+supabase/.temp/
