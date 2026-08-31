@@ -6,7 +6,7 @@ function requireClient() {
 }
 
 export async function getSalons({ homeOnly = false } = {}) {
-  let query = requireClient().from('salons').select('*, services(*), specialists(*)').eq('is_active', true)
+  let query = requireClient().from('salons').select('*, services(*), reviews(rating)').eq('is_active', true)
   if (homeOnly) query = query.eq('offers_home_service', true)
   const { data, error } = await query.order('name')
   if (error) throw error
