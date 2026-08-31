@@ -1,8 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { isSupabaseConfigured, mapSupabaseUser, supabase } from '../lib/supabase.js'
 
-const STORAGE_KEY = 'auraUser'
 const AuthContext = createContext(null)
 
 export function navigate(to, { replace = false } = {}) {
@@ -16,13 +16,44 @@ export function AuthProvider({ children }) {
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) setUser(JSON.parse(saved))
-    } catch {
-      localStorage.removeItem(STORAGE_KEY)
-    } finally {
+    let active = true
+
+    async function resolveUser(authUser) {
+      if (!authUser) return null
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, phone, role, avatar_url')
+        .eq('id', authUser.id)
+        .maybeSingle()
+      return mapSupabaseUser(authUser, profile)
+    }
+
+    if (!isSupabaseConfigured) {
       setIsReady(true)
+      return undefined
+    }
+
+    supabase.auth.getSession().then(async ({ data }) => {
+      const nextUser = await resolveUser(data.session?.user)
+      if (active) {
+        setUser(nextUser)
+        setIsReady(true)
+      }
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      window.setTimeout(async () => {
+        const nextUser = await resolveUser(session?.user)
+        if (active) {
+          setUser(nextUser)
+          setIsReady(true)
+        }
+      }, 0)
+    })
+
+    return () => {
+      active = false
+      listener.subscription.unsubscribe()
     }
   }, [])
 
@@ -30,12 +61,18 @@ export function AuthProvider({ children }) {
     user,
     isAuthenticated: Boolean(user),
     isReady,
-    login(nextUser) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser))
+    isSupabaseConfigured,
+    async login(email, password) {
+      if (!supabase) throw new Error('Supabase is not configured.')
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      const { data: profile } = await supabase.from('profiles').select('full_name, phone, role, avatar_url').eq('id', data.user.id).maybeSingle()
+      const nextUser = mapSupabaseUser(data.user, profile)
       setUser(nextUser)
+      return nextUser
     },
-    logout() {
-      localStorage.removeItem(STORAGE_KEY)
+    async logout() {
+      if (supabase) await supabase.auth.signOut()
       setUser(null)
     },
   }), [user, isReady])
