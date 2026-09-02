@@ -13,6 +13,17 @@ export async function getSalons({ homeOnly = false } = {}) {
   return data
 }
 
+export async function getSalonDetails(slug) {
+  const { data, error } = await requireClient()
+    .from('salons')
+    .select('*, services(*), specialists(*), reviews(*)')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function getMyBookings(userId) {
   const { data, error } = await requireClient()
     .from('bookings')
