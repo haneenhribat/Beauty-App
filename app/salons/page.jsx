@@ -1,3 +1,3 @@
 'use client'
-import { SalonDiscoveryPage } from '../../src/salons.jsx'
-export default SalonDiscoveryPage
+import { AdvancedSalonDiscoveryPage } from '../../src/discovery.jsx'
+export default AdvancedSalonDiscoveryPage
