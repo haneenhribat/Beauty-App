@@ -23,6 +23,15 @@ export async function getMyBookings(userId) {
   return data
 }
 
+export async function getFavorites(userId) {
+  const { data, error } = await requireClient()
+    .from('favorites')
+    .select('salon:salons(*, services(*), reviews(rating))')
+    .eq('user_id', userId)
+  if (error) throw error
+  return data.map(item => item.salon).filter(Boolean)
+}
+
 export async function createBooking(values) {
   const { data, error } = await requireClient().from('bookings').insert(values).select().single()
   if (error) throw error

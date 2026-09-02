@@ -79,7 +79,7 @@ export function ReviewModal({ booking, onClose, onSubmit }) {
 
 export function EmptyBookingsState({ tab }) { return <div className="rounded-3xl border border-dashed border-wine-200 bg-white px-6 py-16 text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-wine-50 text-wine-700"><CalendarCheck size={28}/></div><h2 className="mt-5 font-display text-2xl font-bold">No {tab.toLowerCase()} bookings yet</h2><p className="mx-auto mt-2 max-w-md text-stone-500">Discover salons and book your next beauty appointment with Aura.</p><a href="/salons" className="btn-primary mt-6 inline-flex rounded-xl">Discover Salons</a></div> }
 
-function mapDatabaseBooking(row) {
+export function mapDatabaseBooking(row) {
   const appointment = new Date(row.appointment_at)
   const status = row.status.charAt(0).toUpperCase() + row.status.slice(1)
   return {
