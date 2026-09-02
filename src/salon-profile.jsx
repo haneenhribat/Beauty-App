@@ -31,6 +31,7 @@ import {
 import { useAuth } from "./context/AuthContext.jsx";
 import {
   getFavorites,
+  getMyBookings,
   getSalonDetails,
   toggleFavorite,
 } from "./lib/aura-api.js";
@@ -430,7 +431,7 @@ function Specialists({ salon, items }) {
   );
 }
 
-function Reviews({ reviews }) {
+function Reviews({ reviews, canReview }) {
   const [sort, setSort] = useState("Most Recent");
   const sorted = useMemo(
     () =>
@@ -521,9 +522,16 @@ function Reviews({ reviews }) {
               No reviews yet. Be the first to review a completed appointment.
             </div>
           )}
-          <a href="#reviews" className="btn-secondary rounded-xl">
-            View all reviews
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <a href="#reviews" className="btn-secondary rounded-xl">
+              View all reviews
+            </a>
+            {canReview && (
+              <a href="/my-bookings" className="btn-primary rounded-xl">
+                Leave a review
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -536,17 +544,25 @@ export function SalonProfilePage({ id }) {
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [galleryOpen, setGalleryOpen] = useState(false),
-    [favorite, setFavorite] = useState(false);
+    [favorite, setFavorite] = useState(false),
+    [canReview, setCanReview] = useState(false);
   useEffect(() => {
     let active = true;
     Promise.all([
       getSalonDetails(id),
       isAuthenticated ? getFavorites(user.id) : Promise.resolve([]),
+      isAuthenticated ? getMyBookings(user.id) : Promise.resolve([]),
     ])
-      .then(([row, favorites]) => {
+      .then(([row, favorites, bookings]) => {
         if (!active) return;
         setSalon(row);
         setFavorite(favorites.some((x) => x.slug === id));
+        setCanReview(
+          bookings.some(
+            (booking) =>
+              booking.salon_id === row.id && booking.status === "completed",
+          ),
+        );
         const recent = [
           id,
           ...loadLocal("auraRecentlyViewed", []).filter((x) => x !== id),
@@ -869,7 +885,7 @@ export function SalonProfilePage({ id }) {
                 ))}
               </div>
             </section>
-            <Reviews reviews={reviews} />
+            <Reviews reviews={reviews} canReview={canReview} />
             <section className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
               <SectionTitle eyebrow="Before you book" title="Salon policies" />
               <div className="mt-5 divide-y divide-stone-100">
