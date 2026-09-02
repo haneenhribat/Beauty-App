@@ -1,76 +1,1473 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import * as I from 'lucide-react'
-import { BookingPage, SalonDetailsPage, SalonDiscoveryPage } from './salons.jsx'
-import { MyBookingsPage } from './bookings.jsx'
-import { ProtectedRoute } from './components/ProtectedRoute.jsx'
-import { navigate, useAuth } from './context/AuthContext.jsx'
-import { CustomerDashboard, FavoritesPage, NotificationsPage } from './dashboard.jsx'
-import { AdvancedSalonDiscoveryPage } from './discovery.jsx'
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import * as I from "lucide-react";
+import { BookingPage, SalonDiscoveryPage } from "./salons.jsx";
+import { SalonProfilePage as SalonDetailsPage } from "./salon-profile.jsx";
+import { MyBookingsPage } from "./bookings.jsx";
+import { ProtectedRoute } from "./components/ProtectedRoute.jsx";
+import { navigate, useAuth } from "./context/AuthContext.jsx";
+import {
+  CustomerDashboard,
+  FavoritesPage,
+  NotificationsPage,
+} from "./dashboard.jsx";
+import { AdvancedSalonDiscoveryPage } from "./discovery.jsx";
 
-const nav = [['Home','home'],['Features','features'],['How It Works','how'],['For Salons','salons'],['AI Assistant','assistant'],['Contact','contact']]
+const nav = [
+  ["Home", "home"],
+  ["Features", "features"],
+  ["How It Works", "how"],
+  ["For Salons", "salons"],
+  ["AI Assistant", "assistant"],
+  ["Contact", "contact"],
+];
 const features = [
-  [I.MapPin,'Salon discovery','Find top-rated salons near you with transparent availability.','/salons','Discover salons'],
-  [I.CalendarCheck,'Easy booking','Pick your service, specialist, date and time in a few taps.','/salons','Start booking'],
-  [I.House,'Home services','Bring trusted beauty professionals right to your doorstep.','/salons?home=true','Find home services'],
-  [I.ShoppingBag,'Beauty marketplace','Shop handpicked products from brands and local salons.','#marketplace','Explore products'],
-  [I.Star,'Verified reviews','Book confidently with ratings from real Aura customers.','/salons','Compare reviews'],
-  [I.WalletCards,'Flexible payments','Pay securely online or choose cash on delivery.','/booking/luna-beauty','See booking options'],
-  [I.BellRing,'Smart reminders','Stay on track with appointment and delivery updates.','/my-bookings','View my bookings'],
-  [I.PackageCheck,'Live tracking','Follow every product delivery from checkout to your door.','/dashboard','Open dashboard']
-]
+  [
+    I.MapPin,
+    "Salon discovery",
+    "Find top-rated salons near you with transparent availability.",
+    "/salons",
+    "Discover salons",
+  ],
+  [
+    I.CalendarCheck,
+    "Easy booking",
+    "Pick your service, specialist, date and time in a few taps.",
+    "/salons",
+    "Start booking",
+  ],
+  [
+    I.House,
+    "Home services",
+    "Bring trusted beauty professionals right to your doorstep.",
+    "/salons?home=true",
+    "Find home services",
+  ],
+  [
+    I.ShoppingBag,
+    "Beauty marketplace",
+    "Shop handpicked products from brands and local salons.",
+    "#marketplace",
+    "Explore products",
+  ],
+  [
+    I.Star,
+    "Verified reviews",
+    "Book confidently with ratings from real Aura customers.",
+    "/salons",
+    "Compare reviews",
+  ],
+  [
+    I.WalletCards,
+    "Flexible payments",
+    "Pay securely online or choose cash on delivery.",
+    "/booking/luna-beauty",
+    "See booking options",
+  ],
+  [
+    I.BellRing,
+    "Smart reminders",
+    "Stay on track with appointment and delivery updates.",
+    "/my-bookings",
+    "View my bookings",
+  ],
+  [
+    I.PackageCheck,
+    "Live tracking",
+    "Follow every product delivery from checkout to your door.",
+    "/dashboard",
+    "Open dashboard",
+  ],
+];
 const products = [
-  {name:'Radiance Serum', type:'SKINCARE', price:'$38', c:'#ddd0b8'},
-  {name:'Velvet Lip Tint', type:'MAKEUP', price:'$22', c:'#bb6d70'},
-  {name:'Silk Repair Oil', type:'HAIRCARE', price:'$29', c:'#d8b46f'}
-]
-const reveal = { initial:{opacity:0,y:24}, whileInView:{opacity:1,y:0}, viewport:{once:true,amount:.2}, transition:{duration:.55,ease:[.2,.8,.2,1]} }
+  { name: "Radiance Serum", type: "SKINCARE", price: "$38", c: "#ddd0b8" },
+  { name: "Velvet Lip Tint", type: "MAKEUP", price: "$22", c: "#bb6d70" },
+  { name: "Silk Repair Oil", type: "HAIRCARE", price: "$29", c: "#d8b46f" },
+];
+const reveal = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.55, ease: [0.2, 0.8, 0.2, 1] },
+};
 
-function Logo({light=false,href='/#home'}){return <a href={href} className={`flex items-center gap-2.5 font-display text-2xl font-bold tracking-tight ${light?'text-white':'text-ink'}`}><span className={`grid h-9 w-9 place-items-center rounded-full ${light?'bg-white text-wine-700':'bg-wine-700 text-white'}`}><I.Sparkles size={17}/></span>Aura</a>}
-
-function AccountMenu({ mobile=false }){const {user,logout}=useAuth();const [open,setOpen]=useState(false);const leave=()=>{logout();setOpen(false);navigate('/')};return <div className={`relative ${mobile?'mt-4':''}`}><button onClick={()=>setOpen(!open)} aria-haspopup="menu" aria-expanded={open} aria-label="Open account menu" className={`flex items-center gap-2 rounded-full border border-wine-200 bg-white text-wine-800 shadow-sm transition hover:border-wine-400 ${mobile?'w-full px-3 py-2.5':'py-1.5 pl-2.5 pr-3'}`}><span className="grid h-8 w-8 place-items-center rounded-full bg-wine-700 text-white"><I.CircleUserRound size={18}/></span><span className="hidden text-sm font-bold sm:inline">Hi, {user?.name}</span><I.ChevronDown size={14} className={`transition ${open?'rotate-180':''}`}/></button>{open&&<motion.div initial={{opacity:0,y:-6}} animate={{opacity:1,y:0}} role="menu" className={`z-50 mt-2 w-56 rounded-2xl border border-stone-100 bg-white p-2 shadow-soft ${mobile?'relative':'absolute right-0'}`}>{[[I.UserRound,'My Profile','/profile'],[I.CalendarCheck,'My Bookings','/my-bookings'],[I.Heart,'Favorites','/favorites'],[I.Settings,'Settings','/profile#settings']].map(([Icon,label,to])=><a key={label} href={to} onClick={()=>setOpen(false)} role="menuitem" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-600 hover:bg-wine-50 hover:text-wine-800"><Icon size={16}/>{label}</a>)}<div className="my-1 border-t border-stone-100"/><button onClick={leave} role="menuitem" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50"><I.LogOut size={16}/>Logout</button></motion.div>}</div>}
-
-function Navbar(){const [open,setOpen]=useState(false);const {isAuthenticated,isReady}=useAuth();return <header className="fixed inset-x-0 top-0 z-50 border-b border-wine-900/5 bg-cream/85 backdrop-blur-xl"><nav className="wrap flex h-[76px] items-center justify-between" aria-label="Main navigation"><Logo/><div className="hidden items-center gap-7 lg:flex">{nav.map(([x,id])=><a key={id} className="navlink" href={`#${id}`}>{x}</a>)}</div><div className="hidden items-center gap-3 md:flex">{isReady&&isAuthenticated?<AccountMenu/>:<><a href="/login" className="px-3 text-sm font-semibold text-ink">Sign in</a><a href="#features" className="btn-primary py-3">Get started <I.ArrowUpRight size={16}/></a></>}</div><button className="grid h-11 w-11 place-items-center rounded-full border border-wine-900/10 md:hidden" onClick={()=>setOpen(!open)} aria-label="Toggle menu" aria-expanded={open}>{open?<I.X/>:<I.Menu/>}</button></nav>{open&&<motion.div initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} className="border-t border-wine-900/5 bg-cream px-5 pb-6 md:hidden">{nav.map(([x,id])=><a onClick={()=>setOpen(false)} key={id} className="block border-b border-wine-900/5 py-3 font-medium" href={`#${id}`}>{x}</a>)}{isReady&&isAuthenticated?<AccountMenu mobile/>:<><a href="/login" className="mt-4 block py-2 font-semibold text-wine-700">Sign in</a><a href="#features" className="btn-primary mt-2 w-full">Get started</a></>}</motion.div>}</header>}
-
-function BookingCard(){return <div className="absolute -bottom-7 -left-5 z-20 w-[240px] rounded-2xl bg-white p-4 shadow-soft sm:-left-16"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-xl bg-wine-50 text-wine-700"><I.CalendarCheck size={20}/></div><div><p className="text-xs text-stone-500">Upcoming appointment</p><p className="text-sm font-bold">Hair styling · 10:30</p></div></div><div className="mt-3 flex items-center justify-between rounded-lg bg-[#f8f5f0] px-3 py-2 text-xs"><span>Tomorrow, 18 June</span><span className="font-bold text-wine-700">Confirmed</span></div></div>}
-
-function Hero(){return <section id="home" className="relative overflow-hidden bg-cream pb-20 pt-32 lg:pb-28 lg:pt-40"><div className="orb -right-48 -top-52 h-[540px] w-[540px] bg-blush/70"/><div className="wrap grid items-center gap-16 lg:grid-cols-[1.05fr_.95fr]"><motion.div {...reveal} className="relative z-10"><div className="eyebrow"><I.Sparkle size={14}/> Your beauty. Your time. Your way.</div><h1 className="mt-7 max-w-[750px] font-display text-5xl font-medium leading-[1.05] tracking-[-.055em] text-ink sm:text-6xl lg:text-[74px]">Beauty Services, <span className="text-wine-700">Smarter</span> and Closer to You.</h1><p className="mt-7 max-w-xl text-lg leading-8 text-stone-600">Discover trusted salons, book expert specialists, and shop curated beauty—all in one seamless experience built around you.</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><a className="btn-primary" href="#features">Explore Aura <I.ArrowRight size={18}/></a><a className="btn-secondary" href="#how"><I.Play size={17} fill="currentColor"/> See how it works</a></div><div className="mt-9 flex items-center gap-4"><div className="flex -space-x-2">{['#9f6a54','#d6a48c','#6f4337','#c58f78'].map((c,i)=><div key={i} className="h-9 w-9 rounded-full border-2 border-cream" style={{background:c}}/>)}</div><div><div className="flex text-[#c18c35]">{[1,2,3,4,5].map(x=><I.Star key={x} size={14} fill="currentColor"/>)}</div><p className="mt-1 text-xs font-semibold text-stone-600">Loved by 10,000+ beauty lovers</p></div></div></motion.div><motion.div initial={{opacity:0,scale:.94,x:30}} animate={{opacity:1,scale:1,x:0}} transition={{duration:.8}} className="relative mx-auto w-full max-w-[510px]"><div className="relative ml-auto w-[86%] overflow-hidden rounded-[2.5rem] border-[10px] border-white bg-white shadow-soft"><img src="/assets/aura-hero.png" alt="Aura beauty specialist campaign" className="h-[570px] w-full object-cover"/><div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 p-4 backdrop-blur"><div className="flex items-center justify-between"><div><p className="text-xs text-stone-500">Recommended for you</p><p className="mt-1 font-bold">Luna Beauty Studio</p></div><div className="flex items-center gap-1 rounded-full bg-wine-700 px-2.5 py-1 text-xs font-bold text-white"><I.Star size={12} fill="currentColor"/>4.9</div></div></div></div><div className="absolute -right-2 top-12 rounded-2xl bg-white p-3 shadow-card"><I.Heart className="text-wine-600" fill="#f1e2e5"/></div><BookingCard/></motion.div></div></section>}
-
-function Stats(){return <section className="border-y border-wine-900/5 bg-white"><div className="wrap grid grid-cols-2 divide-x divide-wine-900/10 py-8 lg:grid-cols-4">{[['50+','Partner salons'],['100+','Beauty services'],['24/7','AI support'],['4.9','Average rating']].map(([a,b])=><div className="px-4 py-4 text-center" key={b}><p className="font-display text-3xl font-bold text-wine-700 lg:text-4xl">{a}</p><p className="mt-1 text-sm text-stone-500">{b}</p></div>)}</div></section>}
-function SectionTitle({tag,title,copy,light=false}){return <div className={`mx-auto max-w-2xl text-center ${light?'text-white':''}`}><div className={`eyebrow ${light?'border-white/20 bg-white/10 text-white':''}`}>{tag}</div><h2 className={`mt-5 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl ${light?'text-white':'text-ink'}`}>{title}</h2>{copy&&<p className={`mt-5 leading-7 ${light?'text-white/65':'text-stone-600'}`}>{copy}</p>}</div>}
-function Features(){return <section id="features" className="section bg-[#f7f2ec]"><div className="wrap"><SectionTitle tag="Everything you need" title="Beauty, without the guesswork." copy="From discovery to delivery, Aura brings every part of your beauty routine into one beautifully simple platform."/><div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{features.map(([Icon,t,d,href,action],i)=><motion.a {...reveal} transition={{delay:i*.04}} key={t} href={href} aria-label={`${action}: ${t}`} className="group flex rounded-2xl border border-white bg-white/75 p-6 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card focus:outline-none focus:ring-2 focus:ring-wine-500 focus:ring-offset-2"><span className="flex w-full flex-col"><span className="grid h-12 w-12 place-items-center rounded-xl bg-wine-50 text-wine-700 transition group-hover:bg-wine-700 group-hover:text-white"><Icon size={22}/></span><span className="mt-6 text-lg font-bold">{t}</span><span className="mt-2 flex-1 text-sm leading-6 text-stone-500">{d}</span><span className="mt-5 flex items-center gap-1.5 text-sm font-bold text-wine-700">{action}<I.ArrowRight size={15} className="transition group-hover:translate-x-1"/></span></span></motion.a>)}</div></div></section>}
-
-function How(){return <section id="how" className="section bg-white"><div className="wrap"><SectionTitle tag="How Aura works" title="From search to self-care in minutes."/><div className="relative mt-16 grid gap-8 md:grid-cols-4"><div className="absolute left-[12%] right-[12%] top-7 hidden border-t border-dashed border-wine-300 md:block"/>{[[I.Search,'01','Discover','Browse salons, specialists and services near you.'],[I.UserRoundCheck,'02','Choose','Compare prices, portfolios and verified reviews.'],[I.CalendarDays,'03','Book','Select a time and payment method that suits you.'],[I.Smile,'04','Enjoy','Relax—we handle reminders and everything after.']].map(([Icon,n,t,d])=><motion.div {...reveal} className="relative text-center" key={t}><div className="relative mx-auto grid h-14 w-14 place-items-center rounded-full bg-wine-700 text-white shadow-lg shadow-wine-700/20"><Icon size={22}/><span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-blush text-[10px] font-bold text-wine-800">{n}</span></div><h3 className="mt-6 text-xl font-bold">{t}</h3><p className="mx-auto mt-2 max-w-[220px] text-sm leading-6 text-stone-500">{d}</p></motion.div>)}</div></div></section>}
-
-function Assistant(){return <section id="assistant" className="section overflow-hidden bg-wine-900"><div className="wrap grid items-center gap-14 lg:grid-cols-2"><motion.div {...reveal}><div className="eyebrow border-white/10 bg-white/10 text-white"><I.Bot size={14}/> Aura AI · Always here</div><h2 className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-.04em] text-white sm:text-5xl">Your personal beauty concierge, available 24/7.</h2><p className="mt-5 max-w-lg leading-7 text-white/65">Get tailored recommendations, find the perfect specialist, change a booking, or track an order—simply ask Aura.</p><div className="mt-8 grid gap-4 sm:grid-cols-3">{[[I.MessagesSquare,'Instant answers'],[I.WandSparkles,'Smart matches'],[I.CalendarClock,'Booking help']].map(([Icon,t])=><div className="flex items-center gap-3 text-sm font-semibold text-white" key={t}><Icon size={18} className="text-[#d6a6ad]"/>{t}</div>)}</div></motion.div><motion.div {...reveal} className="mx-auto w-full max-w-md rounded-[2rem] bg-[#f8f4ef] p-3 shadow-2xl"><div className="rounded-[1.4rem] bg-white p-5"><div className="flex items-center gap-3 border-b border-stone-100 pb-4"><div className="grid h-11 w-11 place-items-center rounded-full bg-wine-700 text-white"><I.Sparkles size={18}/></div><div><p className="font-bold">Aura Assistant</p><p className="flex items-center gap-1 text-xs text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>Online now</p></div><I.MoreHorizontal className="ml-auto text-stone-400"/></div><div className="space-y-4 py-5 text-sm"><div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3 leading-6">Hi Maya! How can I make your beauty day easier? ✨</div><div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-wine-700 px-4 py-3 leading-6 text-white">I need a highly-rated nail artist near me tomorrow afternoon.</div><div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3 leading-6">I found 3 wonderful options. <b>Noura at Muse Studio</b> has a 4.9 rating and is free at 3:30 PM.</div><button className="w-full rounded-xl border border-wine-200 bg-wine-50 py-3 font-bold text-wine-700">View available specialists</button></div><div className="flex items-center gap-2 rounded-xl bg-stone-100 px-4 py-3 text-sm text-stone-400"><span>Ask Aura anything...</span><button aria-label="Send message" className="ml-auto grid h-8 w-8 place-items-center rounded-full bg-wine-700 text-white"><I.ArrowUp size={15}/></button></div></div></motion.div></div></section>}
-
-function HomeService(){return <section className="section bg-cream"><div className="wrap grid items-center gap-14 lg:grid-cols-2"><motion.div {...reveal} className="relative"><div className="aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#d8c6b5] p-7 shadow-card"><div className="grid h-full place-items-center rounded-[1.5rem] border border-white/40 bg-gradient-to-br from-[#eee1d7] to-[#b99785]"><div className="w-[80%] rounded-2xl bg-white p-5 shadow-soft"><div className="mb-5 flex justify-between"><div><p className="text-xs text-stone-400">HOME APPOINTMENT</p><p className="mt-1 font-bold">Glow facial treatment</p></div><div className="grid h-10 w-10 place-items-center rounded-full bg-wine-50 text-wine-700"><I.House size={18}/></div></div><div className="flex items-center gap-3 border-t border-stone-100 pt-4"><div className="h-10 w-10 rounded-full bg-[#aa7564]"/><div><p className="text-sm font-bold">Layla K.</p><p className="text-xs text-stone-500">Certified skin specialist · 4.9 ★</p></div><span className="ml-auto rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700">ON THE WAY</span></div></div></div></div><div className="absolute -bottom-5 -right-3 rounded-2xl bg-wine-700 p-4 text-white shadow-xl sm:right-7"><I.ShieldCheck/><p className="mt-2 text-xs font-bold">Vetted professionals</p></div></motion.div><motion.div {...reveal}><div className="eyebrow"><I.House size={14}/> At-home beauty</div><h2 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Beauty Comes to You.</h2><p className="mt-5 text-lg leading-8 text-stone-600">Your favorite treatments, in your favorite place. Book vetted specialists for makeup, hair, nails, skincare and more—without leaving home.</p><ul className="mt-7 space-y-4">{['Verified and experienced specialists','Clear pricing with no hidden fees','Live arrival updates and secure payment'].map(x=><li key={x} className="flex items-center gap-3 text-sm font-semibold"><I.CheckCircle2 size={19} className="text-wine-600"/>{x}</li>)}</ul><a href="#features" className="btn-primary mt-9">Book a home service <I.ArrowRight size={17}/></a></motion.div></div></section>}
-
-function Marketplace(){return <section id="marketplace" className="section scroll-mt-20 bg-[#f2ebe3]"><div className="wrap"><div className="flex flex-col items-end justify-between gap-5 sm:flex-row"><div><div className="eyebrow">Curated for you</div><h2 className="mt-5 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">The beauty shelf, reimagined.</h2></div><a className="flex items-center gap-2 text-sm font-bold text-wine-700" href="#contact">Shop all products <I.ArrowRight size={16}/></a></div><div className="mt-12 grid gap-5 md:grid-cols-3">{products.map((p,i)=><motion.article {...reveal} key={p.name} className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-card"><div className="relative grid h-64 place-items-center overflow-hidden" style={{background:`linear-gradient(145deg, ${p.c}55, ${p.c})`}}><button aria-label={`Save ${p.name}`} className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white"><I.Heart size={17}/></button><div className={`product product-${i}`}><span>AURA</span></div></div><div className="p-5"><p className="text-[10px] font-bold tracking-[.18em] text-stone-400">{p.type}</p><div className="mt-2 flex items-end justify-between"><div><h3 className="font-bold">{p.name}</h3><div className="mt-2 flex text-[#c18c35]">{[1,2,3,4,5].map(x=><I.Star key={x} size={12} fill="currentColor"/>)}</div></div><p className="text-lg font-bold text-wine-700">{p.price}</p></div></div></motion.article>)}</div></div></section>}
-
-function Salons(){return <section id="salons" className="section bg-white"><div className="wrap grid gap-14 lg:grid-cols-[.9fr_1.1fr]"><motion.div {...reveal}><div className="eyebrow"><I.Store size={14}/> Aura for business</div><h2 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Grow your salon. We’ll handle the busywork.</h2><p className="mt-5 leading-7 text-stone-600">One elegant dashboard to fill your calendar, build your reputation and turn new customers into loyal regulars.</p><a className="btn-primary mt-8" href="#contact">Partner with Aura <I.ArrowUpRight size={17}/></a></motion.div><div className="grid gap-4 sm:grid-cols-2">{[[I.LayoutDashboard,'Simpler bookings','Manage schedules, appointments and cancellations at a glance.'],[I.Megaphone,'Smarter promotion','Create offers and get discovered by people nearby.'],[I.Users,'More customers','Reach thousands of beauty lovers actively looking to book.'],[I.BadgeCheck,'Stronger reputation','Showcase your specialists, portfolios and verified reviews.']].map(([Icon,t,d])=><motion.div {...reveal} className="rounded-2xl border border-stone-100 p-6 hover:border-wine-200 hover:shadow-card" key={t}><Icon className="text-wine-700"/><h3 className="mt-5 font-bold">{t}</h3><p className="mt-2 text-sm leading-6 text-stone-500">{d}</p></motion.div>)}</div></div></section>}
-
-function Testimonials(){return <section className="section bg-cream"><div className="wrap"><SectionTitle tag="Real people, real glow" title="Loved by customers and salons."/><div className="mt-12 grid gap-5 lg:grid-cols-3">{[["Aura makes booking my self-care appointments almost too easy. I found my favorite stylist through the app.",'Maya H.','Aura customer'],["Home service is a lifesaver. My makeup artist arrived exactly on time and the whole experience felt so professional.",'Sara A.','Aura customer'],["Our quieter weekdays are finally filling up. Aura has helped new clients discover us without adding admin work.",'Rania K.','Salon owner']].map(([q,n,r],i)=><motion.figure {...reveal} key={n} className={`rounded-2xl p-7 ${i===1?'bg-wine-700 text-white':'bg-white'}`}><div className={`flex ${i===1?'text-[#f0c46b]':'text-[#c18c35]'}`}>{[1,2,3,4,5].map(x=><I.Star key={x} size={15} fill="currentColor"/>)}</div><blockquote className="mt-6 text-lg leading-8">“{q}”</blockquote><figcaption className="mt-7 flex items-center gap-3"><div className={`grid h-11 w-11 place-items-center rounded-full text-sm font-bold ${i===1?'bg-white/15':'bg-wine-50 text-wine-700'}`}>{n[0]}</div><div><p className="text-sm font-bold">{n}</p><p className={`text-xs ${i===1?'text-white/55':'text-stone-400'}`}>{r}</p></div></figcaption></motion.figure>)}</div></div></section>}
-
-function FinalCTA(){return <section id="contact" className="px-4 py-16 sm:px-6"><motion.div {...reveal} className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-wine-800 px-6 py-20 text-center text-white sm:px-10"><div className="orb -left-20 -top-32 h-80 w-80 bg-wine-500/40"/><div className="orb -bottom-40 -right-20 h-96 w-96 bg-[#a97267]/30"/><div className="relative"><div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white/10"><I.Sparkles/></div><h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Your next beauty moment is closer than you think.</h2><p className="mx-auto mt-5 max-w-xl text-white/65">Join Aura today and make every appointment, product and beauty discovery feel effortless.</p><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><a href="#home" className="btn bg-white text-wine-800 hover:bg-blush">Get started free <I.ArrowRight size={17}/></a><a href="mailto:hello@aura.beauty" className="btn border border-white/20 text-white hover:bg-white/10">Talk to our team</a></div></div></motion.div></section>}
-
-function Footer(){return <footer className="bg-[#211a1c] pb-8 pt-16 text-white"><div className="wrap"><div className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-5"><div className="lg:col-span-2"><Logo light/><p className="mt-5 max-w-xs text-sm leading-6 text-white/50">A smarter, more personal way to discover, book and enjoy beauty.</p><div className="mt-6 flex gap-2">{[I.Instagram,I.Facebook,I.Linkedin].map((Icon,i)=><a key={i} href="#" aria-label="Social link" className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/60 hover:bg-white hover:text-wine-800"><Icon size={16}/></a>)}</div></div>{[['Platform','Explore salons','Home services','Marketplace','Aura AI'],['Business','For salons','Partner with us','Business login','Resources'],['Support','Help center','Contact us','Privacy','Terms']].map(([h,...links])=><div key={h}><h3 className="text-sm font-bold">{h}</h3><div className="mt-5 space-y-3">{links.map(x=><a className="block text-sm text-white/50 hover:text-white" href="#" key={x}>{x}</a>)}</div></div>)}</div><div className="flex flex-col gap-3 pt-6 text-xs text-white/35 sm:flex-row sm:justify-between"><p>© 2026 Aura Beauty Technologies. All rights reserved.</p><p>Made with care for your glow.</p></div></div></footer>}
-function Field({label,error,children}){return <div><label className="mb-2 block text-sm font-semibold text-ink">{label}</label>{children}{error&&<p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-700" role="alert"><I.CircleAlert size={13}/>{error}</p>}</div>}
-
-export function LoginPage(){
-  const {user,isAuthenticated,isReady,login}=useAuth()
-  const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [show,setShow]=useState(false); const [remember,setRemember]=useState(false); const [errors,setErrors]=useState({}); const [success,setSuccess]=useState(false)
-  React.useEffect(()=>{if(isReady&&isAuthenticated&&!success)navigate(`/dashboard?role=${user.role}`,{replace:true})},[isReady,isAuthenticated,success,user])
-  const validate=()=>{const next={}; if(!email.trim())next.email='Email is required.'; else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))next.email='Enter a valid email address.'; if(!password)next.password='Password is required.'; setErrors(next); return Object.keys(next).length===0}
-  const submit=async e=>{e.preventDefault(); if(!validate())return;setErrors({});try{const authenticatedUser=await login(email.trim().toLowerCase(),password);setSuccess(true);const returnTo=localStorage.getItem('auraReturnTo');localStorage.removeItem('auraReturnTo');setTimeout(()=>navigate(returnTo||`/dashboard?role=${authenticatedUser.role}`,{replace:true}),650)}catch(error){setErrors({auth:error?.message||'Unable to sign in. Please check your details and try again.'})}}
-  return <main className="relative min-h-screen overflow-hidden bg-cream"><div className="orb -left-40 -top-40 h-[430px] w-[430px] bg-blush/70"/><div className="orb -bottom-48 -right-32 h-[500px] w-[500px] bg-wine-100/80"/><div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[.9fr_1.1fr]"><section className="relative hidden overflow-hidden bg-wine-900 p-12 text-white lg:flex lg:flex-col lg:justify-between"><Logo light href="/"/><div className="relative z-10"><div className="eyebrow border-white/15 bg-white/10 text-white"><I.Sparkles size={14}/> Beauty, beautifully simple</div><h2 className="mt-7 max-w-md font-display text-5xl font-semibold leading-tight tracking-[-.045em]">Your next beauty moment starts here.</h2><p className="mt-5 max-w-md leading-7 text-white/60">Book trusted specialists, manage appointments and keep your entire beauty routine beautifully organized.</p></div><div className="relative z-10 flex items-center gap-3 text-sm text-white/55"><I.ShieldCheck size={18}/> Secure sign-in · Your privacy protected</div><div className="orb -bottom-32 -right-24 h-80 w-80 bg-wine-500/40"/></section><section className="relative z-10 flex items-center justify-center px-5 py-10 sm:px-10"><motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} className="w-full max-w-md"><div className="mb-10 flex justify-center lg:hidden"><Logo href="/"/></div><a href="/" className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-wine-700"><I.ArrowLeft size={16}/> Back to Aura</a><h1 className="font-display text-4xl font-semibold tracking-[-.04em] text-ink sm:text-5xl">Welcome Back</h1><p className="mt-3 text-stone-500">Sign in to continue your beauty journey with Aura.</p>{success&&<div className="mt-6 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" role="status"><I.CheckCircle2 size={19}/> Signed in successfully. Opening your dashboard…</div>}{errors.auth&&<div className="mt-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800" role="alert"><I.CircleAlert size={18}/>{errors.auth}</div>}<form onSubmit={submit} noValidate className="mt-8 space-y-5"><Field label="Email address" error={errors.email}><div className={`flex items-center rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-wine-200 ${errors.email?'border-red-400':'border-stone-200 focus-within:border-wine-500'}`}><I.Mail size={18} className="text-stone-400"/><input value={email} onChange={e=>{setEmail(e.target.value);setErrors({...errors,email:null,auth:null})}} type="email" autoComplete="email" placeholder="you@example.com" className="w-full bg-transparent px-3 py-3.5 text-sm outline-none" aria-invalid={!!errors.email}/></div></Field><Field label="Password" error={errors.password}><div className={`flex items-center rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-wine-200 ${errors.password?'border-red-400':'border-stone-200 focus-within:border-wine-500'}`}><I.LockKeyhole size={18} className="text-stone-400"/><input value={password} onChange={e=>{setPassword(e.target.value);setErrors({...errors,password:null,auth:null})}} type={show?'text':'password'} autoComplete="current-password" placeholder="Enter your password" className="w-full bg-transparent px-3 py-3.5 text-sm outline-none" aria-invalid={!!errors.password}/><button type="button" onClick={()=>setShow(!show)} className="p-1 text-stone-400 hover:text-wine-700" aria-label={show?'Hide password':'Show password'}>{show?<I.EyeOff size={18}/>:<I.Eye size={18}/>}</button></div></Field><div className="flex items-center justify-between gap-4 text-sm"><label className="flex cursor-pointer items-center gap-2 text-stone-600"><input checked={remember} onChange={e=>setRemember(e.target.checked)} type="checkbox" className="h-4 w-4 rounded border-stone-300 accent-[#642735]"/>Remember me</label><a href="#" className="font-semibold text-wine-700 hover:text-wine-900">Forgot Password?</a></div><button type="submit" disabled={success} className="btn-primary w-full disabled:cursor-wait disabled:opacity-70">{success?'Signing in…':'Sign In'}{!success&&<I.ArrowRight size={17}/>}</button></form><div className="my-7 flex items-center gap-4"><span className="h-px flex-1 bg-stone-200"/><span className="text-xs text-stone-400">or continue with</span><span className="h-px flex-1 bg-stone-200"/></div><button type="button" className="btn-secondary w-full"><span className="grid h-5 w-5 place-items-center rounded-full bg-white text-sm font-bold text-[#4285f4]">G</span>Continue with Google</button><p className="mt-7 text-center text-sm text-stone-500">Don't have an account? <a href="#" className="font-bold text-wine-700 hover:text-wine-900">Create Account</a></p><p className="mt-8 text-center text-xs text-stone-400">Secure authentication powered by Supabase</p></motion.div></section></div></main>
+function Logo({ light = false, href = "/#home" }) {
+  return (
+    <a
+      href={href}
+      className={`flex items-center gap-2.5 font-display text-2xl font-bold tracking-tight ${light ? "text-white" : "text-ink"}`}
+    >
+      <span
+        className={`grid h-9 w-9 place-items-center rounded-full ${light ? "bg-white text-wine-700" : "bg-wine-700 text-white"}`}
+      >
+        <I.Sparkles size={17} />
+      </span>
+      Aura
+    </a>
+  );
 }
 
-const dashboardData={customer:{label:'Customer',greeting:'Your beauty, beautifully organized.',metrics:[['2','Upcoming bookings'],['350','Aura points'],['1','Order in transit']],actions:[[I.Search,'Discover salons'],[I.CalendarDays,'My appointments'],[I.ShoppingBag,'Shop beauty']],activity:'Glow facial with Layla · Tomorrow, 10:30 AM'},specialist:{label:'Specialist',greeting:'Make every appointment exceptional.',metrics:[['6','Today’s clients'],['4.9','Average rating'],['$840','This week']],actions:[[I.CalendarClock,'Manage schedule'],[I.Users,'Client list'],[I.Star,'View reviews']],activity:'Next: Maya H. · Glow facial · 10:30 AM'},owner:{label:'Salon Owner',greeting:'A clearer view of your growing business.',metrics:[['18','Today’s bookings'],['$2.4k','Weekly revenue'],['92%','Chair utilization']],actions:[[I.LayoutDashboard,'Booking manager'],[I.UserRoundCheck,'Specialists'],[I.Megaphone,'Create promotion']],activity:'Luna Beauty Studio is 92% booked today'},admin:{label:'Administrator',greeting:'Keep the Aura ecosystem running beautifully.',metrics:[['1,248','Active users'],['54','Partner salons'],['99.9%','Platform health']],actions:[[I.ShieldCheck,'Review approvals'],[I.Store,'Manage salons'],[I.MessagesSquare,'Support queue']],activity:'3 new salon applications need review'}}
-function RoleDashboardPage(){const {user,logout}=useAuth();const data=dashboardData[user.role]||dashboardData.customer;const leave=()=>{logout();navigate('/')};return <main className="min-h-screen bg-[#f7f2ec]"><header className="border-b border-wine-900/5 bg-white"><div className="wrap flex h-20 items-center justify-between"><Logo href="/"/><AccountMenu/></div></header><div className="wrap py-10 sm:py-14"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><div className="eyebrow"><I.Sparkles size={13}/>{data.label} workspace</div><h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">Welcome back, {user.name}.</h1><p className="mt-3 text-stone-500">{data.greeting}</p></div><button onClick={leave} className="btn-secondary self-start"><I.LogOut size={16}/>Sign out</button></div><section className="mt-10 grid gap-4 sm:grid-cols-3">{data.metrics.map(([value,label])=><article key={label} className="rounded-2xl bg-white p-6 shadow-sm"><p className="font-display text-3xl font-bold text-wine-700">{value}</p><p className="mt-2 text-sm text-stone-500">{label}</p></article>)}</section><div className="mt-5 grid gap-5 lg:grid-cols-[1.25fr_.75fr]"><section className="rounded-2xl bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[.15em] text-wine-600">Quick actions</p><h2 className="mt-2 text-xl font-bold">What would you like to do?</h2><div className="mt-6 grid gap-3 sm:grid-cols-3"><a href="/salons" className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"><I.Search size={20} className="text-wine-700"/><span className="mt-4 block text-sm font-bold">Discover salons</span></a><a href="/my-bookings" className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"><I.CalendarDays size={20} className="text-wine-700"/><span className="mt-4 block text-sm font-bold">My appointments</span></a><a href="/profile" className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"><I.UserRound size={20} className="text-wine-700"/><span className="mt-4 block text-sm font-bold">My profile</span></a></div></section><aside className="rounded-2xl bg-wine-800 p-6 text-white shadow-sm"><I.BellRing size={20}/><p className="mt-6 text-xs font-bold uppercase tracking-[.15em] text-white/50">Latest update</p><p className="mt-3 text-lg font-semibold leading-7">{data.activity}</p></aside></div></div></main>}
+function AccountMenu({ mobile = false }) {
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const leave = () => {
+    logout();
+    setOpen(false);
+    navigate("/");
+  };
+  return (
+    <div className={`relative ${mobile ? "mt-4" : ""}`}>
+      <button
+        onClick={() => setOpen(!open)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Open account menu"
+        className={`flex items-center gap-2 rounded-full border border-wine-200 bg-white text-wine-800 shadow-sm transition hover:border-wine-400 ${mobile ? "w-full px-3 py-2.5" : "py-1.5 pl-2.5 pr-3"}`}
+      >
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-wine-700 text-white">
+          <I.CircleUserRound size={18} />
+        </span>
+        <span className="hidden text-sm font-bold sm:inline">
+          Hi, {user?.name}
+        </span>
+        <I.ChevronDown
+          size={14}
+          className={`transition ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          role="menu"
+          className={`z-50 mt-2 w-56 rounded-2xl border border-stone-100 bg-white p-2 shadow-soft ${mobile ? "relative" : "absolute right-0"}`}
+        >
+          {[
+            [I.UserRound, "My Profile", "/profile"],
+            [I.CalendarCheck, "My Bookings", "/my-bookings"],
+            [I.Heart, "Favorites", "/favorites"],
+            [I.Settings, "Settings", "/profile#settings"],
+          ].map(([Icon, label, to]) => (
+            <a
+              key={label}
+              href={to}
+              onClick={() => setOpen(false)}
+              role="menuitem"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-stone-600 hover:bg-wine-50 hover:text-wine-800"
+            >
+              <Icon size={16} />
+              {label}
+            </a>
+          ))}
+          <div className="my-1 border-t border-stone-100" />
+          <button
+            onClick={leave}
+            role="menuitem"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50"
+          >
+            <I.LogOut size={16} />
+            Logout
+          </button>
+        </motion.div>
+      )}
+    </div>
+  );
+}
 
-export function DashboardPage(){const {user}=useAuth();return user.role==='customer'?<CustomerDashboard/>:<RoleDashboardPage/>}
+function Navbar() {
+  const [open, setOpen] = useState(false);
+  const { isAuthenticated, isReady } = useAuth();
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-wine-900/5 bg-cream/85 backdrop-blur-xl">
+      <nav
+        className="wrap flex h-[76px] items-center justify-between"
+        aria-label="Main navigation"
+      >
+        <Logo />
+        <div className="hidden items-center gap-7 lg:flex">
+          {nav.map(([x, id]) => (
+            <a key={id} className="navlink" href={`#${id}`}>
+              {x}
+            </a>
+          ))}
+        </div>
+        <div className="hidden items-center gap-3 md:flex">
+          {isReady && isAuthenticated ? (
+            <AccountMenu />
+          ) : (
+            <>
+              <a href="/login" className="px-3 text-sm font-semibold text-ink">
+                Sign in
+              </a>
+              <a href="#features" className="btn-primary py-3">
+                Get started <I.ArrowUpRight size={16} />
+              </a>
+            </>
+          )}
+        </div>
+        <button
+          className="grid h-11 w-11 place-items-center rounded-full border border-wine-900/10 md:hidden"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
+          aria-expanded={open}
+        >
+          {open ? <I.X /> : <I.Menu />}
+        </button>
+      </nav>
+      {open && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          className="border-t border-wine-900/5 bg-cream px-5 pb-6 md:hidden"
+        >
+          {nav.map(([x, id]) => (
+            <a
+              onClick={() => setOpen(false)}
+              key={id}
+              className="block border-b border-wine-900/5 py-3 font-medium"
+              href={`#${id}`}
+            >
+              {x}
+            </a>
+          ))}
+          {isReady && isAuthenticated ? (
+            <AccountMenu mobile />
+          ) : (
+            <>
+              <a
+                href="/login"
+                className="mt-4 block py-2 font-semibold text-wine-700"
+              >
+                Sign in
+              </a>
+              <a href="#features" className="btn-primary mt-2 w-full">
+                Get started
+              </a>
+            </>
+          )}
+        </motion.div>
+      )}
+    </header>
+  );
+}
 
-export function ProfilePage(){const {user}=useAuth();const fields=[['Name',user.name],['Email',user.email],['Phone',user.phone||'Not added'],['Account type',dashboardData[user.role]?.label||'Customer']];return <main className="min-h-screen bg-[#f7f2ec]"><header className="border-b border-wine-900/5 bg-white"><div className="wrap flex h-20 items-center justify-between"><Logo href="/"/><AccountMenu/></div></header><section className="wrap py-10 sm:py-14"><div className="eyebrow"><I.UserRound size={13}/>Aura account</div><h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">My Profile</h1><p className="mt-3 text-stone-500">Manage your personal details and account information.</p><div className="mt-9 max-w-2xl overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-card"><div className="flex items-center gap-4 bg-wine-800 p-6 text-white"><div className="grid h-16 w-16 place-items-center rounded-full bg-white/15 text-2xl font-bold">{user.name[0]}</div><div><h2 className="font-display text-2xl font-bold">{user.name}</h2><p className="mt-1 text-sm text-white/60">{dashboardData[user.role]?.label||'Customer'} account</p></div></div><dl className="divide-y divide-stone-100 p-6">{fields.map(([label,value])=><div key={label} className="grid gap-1 py-4 sm:grid-cols-[150px_1fr]"><dt className="text-sm text-stone-400">{label}</dt><dd className="font-semibold">{value}</dd></div>)}</dl><div id="settings" className="border-t border-stone-100 p-6"><h3 className="font-bold">Account settings</h3><p className="mt-2 text-sm text-stone-500">Profile editing and notification preferences will be connected with the Aura backend.</p></div></div></section></main>}
+function BookingCard() {
+  return (
+    <div className="absolute -bottom-7 -left-5 z-20 w-[240px] rounded-2xl bg-white p-4 shadow-soft sm:-left-16">
+      <div className="flex items-center gap-3">
+        <div className="grid h-11 w-11 place-items-center rounded-xl bg-wine-50 text-wine-700">
+          <I.CalendarCheck size={20} />
+        </div>
+        <div>
+          <p className="text-xs text-stone-500">Upcoming appointment</p>
+          <p className="text-sm font-bold">Hair styling · 10:30</p>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between rounded-lg bg-[#f8f5f0] px-3 py-2 text-xs">
+        <span>Tomorrow, 18 June</span>
+        <span className="font-bold text-wine-700">Confirmed</span>
+      </div>
+    </div>
+  );
+}
 
-export default function App(){const [path,setPath]=useState(()=>typeof window==='undefined'?'/':window.location.pathname); React.useEffect(()=>{const sync=()=>setPath(window.location.pathname); window.addEventListener('popstate',sync); return()=>window.removeEventListener('popstate',sync)},[]); if(path==='/login')return <LoginPage/>; if(path==='/dashboard')return <ProtectedRoute><DashboardPage/></ProtectedRoute>; if(path==='/my-bookings')return <ProtectedRoute><MyBookingsPage/></ProtectedRoute>; if(path==='/profile')return <ProtectedRoute><ProfilePage/></ProtectedRoute>; if(path==='/favorites')return <ProtectedRoute><FavoritesPage/></ProtectedRoute>; if(path==='/notifications')return <ProtectedRoute><NotificationsPage/></ProtectedRoute>; if(path==='/salons')return <AdvancedSalonDiscoveryPage/>; if(path.startsWith('/salons/'))return <SalonDetailsPage id={path.split('/')[2]}/>; if(path.startsWith('/booking/'))return <ProtectedRoute><BookingPage id={path.split('/')[2]}/></ProtectedRoute>; return <><Navbar/><main><Hero/><Stats/><Features/><How/><Assistant/><HomeService/><Marketplace/><Salons/><Testimonials/><FinalCTA/></main><Footer/></>}
+function Hero() {
+  return (
+    <section
+      id="home"
+      className="relative overflow-hidden bg-cream pb-20 pt-32 lg:pb-28 lg:pt-40"
+    >
+      <div className="orb -right-48 -top-52 h-[540px] w-[540px] bg-blush/70" />
+      <div className="wrap grid items-center gap-16 lg:grid-cols-[1.05fr_.95fr]">
+        <motion.div {...reveal} className="relative z-10">
+          <div className="eyebrow">
+            <I.Sparkle size={14} /> Your beauty. Your time. Your way.
+          </div>
+          <h1 className="mt-7 max-w-[750px] font-display text-5xl font-medium leading-[1.05] tracking-[-.055em] text-ink sm:text-6xl lg:text-[74px]">
+            Beauty Services, <span className="text-wine-700">Smarter</span> and
+            Closer to You.
+          </h1>
+          <p className="mt-7 max-w-xl text-lg leading-8 text-stone-600">
+            Discover trusted salons, book expert specialists, and shop curated
+            beauty—all in one seamless experience built around you.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a className="btn-primary" href="#features">
+              Explore Aura <I.ArrowRight size={18} />
+            </a>
+            <a className="btn-secondary" href="#how">
+              <I.Play size={17} fill="currentColor" /> See how it works
+            </a>
+          </div>
+          <div className="mt-9 flex items-center gap-4">
+            <div className="flex -space-x-2">
+              {["#9f6a54", "#d6a48c", "#6f4337", "#c58f78"].map((c, i) => (
+                <div
+                  key={i}
+                  className="h-9 w-9 rounded-full border-2 border-cream"
+                  style={{ background: c }}
+                />
+              ))}
+            </div>
+            <div>
+              <div className="flex text-[#c18c35]">
+                {[1, 2, 3, 4, 5].map((x) => (
+                  <I.Star key={x} size={14} fill="currentColor" />
+                ))}
+              </div>
+              <p className="mt-1 text-xs font-semibold text-stone-600">
+                Loved by 10,000+ beauty lovers
+              </p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, x: 30 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative mx-auto w-full max-w-[510px]"
+        >
+          <div className="relative ml-auto w-[86%] overflow-hidden rounded-[2.5rem] border-[10px] border-white bg-white shadow-soft">
+            <img
+              src="/assets/aura-hero.png"
+              alt="Aura beauty specialist campaign"
+              className="h-[570px] w-full object-cover"
+            />
+            <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 p-4 backdrop-blur">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-stone-500">Recommended for you</p>
+                  <p className="mt-1 font-bold">Luna Beauty Studio</p>
+                </div>
+                <div className="flex items-center gap-1 rounded-full bg-wine-700 px-2.5 py-1 text-xs font-bold text-white">
+                  <I.Star size={12} fill="currentColor" />
+                  4.9
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -right-2 top-12 rounded-2xl bg-white p-3 shadow-card">
+            <I.Heart className="text-wine-600" fill="#f1e2e5" />
+          </div>
+          <BookingCard />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function Stats() {
+  return (
+    <section className="border-y border-wine-900/5 bg-white">
+      <div className="wrap grid grid-cols-2 divide-x divide-wine-900/10 py-8 lg:grid-cols-4">
+        {[
+          ["50+", "Partner salons"],
+          ["100+", "Beauty services"],
+          ["24/7", "AI support"],
+          ["4.9", "Average rating"],
+        ].map(([a, b]) => (
+          <div className="px-4 py-4 text-center" key={b}>
+            <p className="font-display text-3xl font-bold text-wine-700 lg:text-4xl">
+              {a}
+            </p>
+            <p className="mt-1 text-sm text-stone-500">{b}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+function SectionTitle({ tag, title, copy, light = false }) {
+  return (
+    <div
+      className={`mx-auto max-w-2xl text-center ${light ? "text-white" : ""}`}
+    >
+      <div
+        className={`eyebrow ${light ? "border-white/20 bg-white/10 text-white" : ""}`}
+      >
+        {tag}
+      </div>
+      <h2
+        className={`mt-5 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl ${light ? "text-white" : "text-ink"}`}
+      >
+        {title}
+      </h2>
+      {copy && (
+        <p
+          className={`mt-5 leading-7 ${light ? "text-white/65" : "text-stone-600"}`}
+        >
+          {copy}
+        </p>
+      )}
+    </div>
+  );
+}
+function Features() {
+  return (
+    <section id="features" className="section bg-[#f7f2ec]">
+      <div className="wrap">
+        <SectionTitle
+          tag="Everything you need"
+          title="Beauty, without the guesswork."
+          copy="From discovery to delivery, Aura brings every part of your beauty routine into one beautifully simple platform."
+        />
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map(([Icon, t, d, href, action], i) => (
+            <motion.a
+              {...reveal}
+              transition={{ delay: i * 0.04 }}
+              key={t}
+              href={href}
+              aria-label={`${action}: ${t}`}
+              className="group flex rounded-2xl border border-white bg-white/75 p-6 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-card focus:outline-none focus:ring-2 focus:ring-wine-500 focus:ring-offset-2"
+            >
+              <span className="flex w-full flex-col">
+                <span className="grid h-12 w-12 place-items-center rounded-xl bg-wine-50 text-wine-700 transition group-hover:bg-wine-700 group-hover:text-white">
+                  <Icon size={22} />
+                </span>
+                <span className="mt-6 text-lg font-bold">{t}</span>
+                <span className="mt-2 flex-1 text-sm leading-6 text-stone-500">
+                  {d}
+                </span>
+                <span className="mt-5 flex items-center gap-1.5 text-sm font-bold text-wine-700">
+                  {action}
+                  <I.ArrowRight
+                    size={15}
+                    className="transition group-hover:translate-x-1"
+                  />
+                </span>
+              </span>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function How() {
+  return (
+    <section id="how" className="section bg-white">
+      <div className="wrap">
+        <SectionTitle
+          tag="How Aura works"
+          title="From search to self-care in minutes."
+        />
+        <div className="relative mt-16 grid gap-8 md:grid-cols-4">
+          <div className="absolute left-[12%] right-[12%] top-7 hidden border-t border-dashed border-wine-300 md:block" />
+          {[
+            [
+              I.Search,
+              "01",
+              "Discover",
+              "Browse salons, specialists and services near you.",
+            ],
+            [
+              I.UserRoundCheck,
+              "02",
+              "Choose",
+              "Compare prices, portfolios and verified reviews.",
+            ],
+            [
+              I.CalendarDays,
+              "03",
+              "Book",
+              "Select a time and payment method that suits you.",
+            ],
+            [
+              I.Smile,
+              "04",
+              "Enjoy",
+              "Relax—we handle reminders and everything after.",
+            ],
+          ].map(([Icon, n, t, d]) => (
+            <motion.div {...reveal} className="relative text-center" key={t}>
+              <div className="relative mx-auto grid h-14 w-14 place-items-center rounded-full bg-wine-700 text-white shadow-lg shadow-wine-700/20">
+                <Icon size={22} />
+                <span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-blush text-[10px] font-bold text-wine-800">
+                  {n}
+                </span>
+              </div>
+              <h3 className="mt-6 text-xl font-bold">{t}</h3>
+              <p className="mx-auto mt-2 max-w-[220px] text-sm leading-6 text-stone-500">
+                {d}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Assistant() {
+  return (
+    <section id="assistant" className="section overflow-hidden bg-wine-900">
+      <div className="wrap grid items-center gap-14 lg:grid-cols-2">
+        <motion.div {...reveal}>
+          <div className="eyebrow border-white/10 bg-white/10 text-white">
+            <I.Bot size={14} /> Aura AI · Always here
+          </div>
+          <h2 className="mt-6 max-w-xl font-display text-4xl font-semibold tracking-[-.04em] text-white sm:text-5xl">
+            Your personal beauty concierge, available 24/7.
+          </h2>
+          <p className="mt-5 max-w-lg leading-7 text-white/65">
+            Get tailored recommendations, find the perfect specialist, change a
+            booking, or track an order—simply ask Aura.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            {[
+              [I.MessagesSquare, "Instant answers"],
+              [I.WandSparkles, "Smart matches"],
+              [I.CalendarClock, "Booking help"],
+            ].map(([Icon, t]) => (
+              <div
+                className="flex items-center gap-3 text-sm font-semibold text-white"
+                key={t}
+              >
+                <Icon size={18} className="text-[#d6a6ad]" />
+                {t}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div
+          {...reveal}
+          className="mx-auto w-full max-w-md rounded-[2rem] bg-[#f8f4ef] p-3 shadow-2xl"
+        >
+          <div className="rounded-[1.4rem] bg-white p-5">
+            <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+              <div className="grid h-11 w-11 place-items-center rounded-full bg-wine-700 text-white">
+                <I.Sparkles size={18} />
+              </div>
+              <div>
+                <p className="font-bold">Aura Assistant</p>
+                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Online now
+                </p>
+              </div>
+              <I.MoreHorizontal className="ml-auto text-stone-400" />
+            </div>
+            <div className="space-y-4 py-5 text-sm">
+              <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3 leading-6">
+                Hi Maya! How can I make your beauty day easier? ✨
+              </div>
+              <div className="ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-wine-700 px-4 py-3 leading-6 text-white">
+                I need a highly-rated nail artist near me tomorrow afternoon.
+              </div>
+              <div className="max-w-[90%] rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3 leading-6">
+                I found 3 wonderful options. <b>Noura at Muse Studio</b> has a
+                4.9 rating and is free at 3:30 PM.
+              </div>
+              <button className="w-full rounded-xl border border-wine-200 bg-wine-50 py-3 font-bold text-wine-700">
+                View available specialists
+              </button>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl bg-stone-100 px-4 py-3 text-sm text-stone-400">
+              <span>Ask Aura anything...</span>
+              <button
+                aria-label="Send message"
+                className="ml-auto grid h-8 w-8 place-items-center rounded-full bg-wine-700 text-white"
+              >
+                <I.ArrowUp size={15} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function HomeService() {
+  return (
+    <section className="section bg-cream">
+      <div className="wrap grid items-center gap-14 lg:grid-cols-2">
+        <motion.div {...reveal} className="relative">
+          <div className="aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#d8c6b5] p-7 shadow-card">
+            <div className="grid h-full place-items-center rounded-[1.5rem] border border-white/40 bg-gradient-to-br from-[#eee1d7] to-[#b99785]">
+              <div className="w-[80%] rounded-2xl bg-white p-5 shadow-soft">
+                <div className="mb-5 flex justify-between">
+                  <div>
+                    <p className="text-xs text-stone-400">HOME APPOINTMENT</p>
+                    <p className="mt-1 font-bold">Glow facial treatment</p>
+                  </div>
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-wine-50 text-wine-700">
+                    <I.House size={18} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 border-t border-stone-100 pt-4">
+                  <div className="h-10 w-10 rounded-full bg-[#aa7564]" />
+                  <div>
+                    <p className="text-sm font-bold">Layla K.</p>
+                    <p className="text-xs text-stone-500">
+                      Certified skin specialist · 4.9 ★
+                    </p>
+                  </div>
+                  <span className="ml-auto rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700">
+                    ON THE WAY
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -bottom-5 -right-3 rounded-2xl bg-wine-700 p-4 text-white shadow-xl sm:right-7">
+            <I.ShieldCheck />
+            <p className="mt-2 text-xs font-bold">Vetted professionals</p>
+          </div>
+        </motion.div>
+        <motion.div {...reveal}>
+          <div className="eyebrow">
+            <I.House size={14} /> At-home beauty
+          </div>
+          <h2 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">
+            Beauty Comes to You.
+          </h2>
+          <p className="mt-5 text-lg leading-8 text-stone-600">
+            Your favorite treatments, in your favorite place. Book vetted
+            specialists for makeup, hair, nails, skincare and more—without
+            leaving home.
+          </p>
+          <ul className="mt-7 space-y-4">
+            {[
+              "Verified and experienced specialists",
+              "Clear pricing with no hidden fees",
+              "Live arrival updates and secure payment",
+            ].map((x) => (
+              <li
+                key={x}
+                className="flex items-center gap-3 text-sm font-semibold"
+              >
+                <I.CheckCircle2 size={19} className="text-wine-600" />
+                {x}
+              </li>
+            ))}
+          </ul>
+          <a href="#features" className="btn-primary mt-9">
+            Book a home service <I.ArrowRight size={17} />
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function Marketplace() {
+  return (
+    <section id="marketplace" className="section scroll-mt-20 bg-[#f2ebe3]">
+      <div className="wrap">
+        <div className="flex flex-col items-end justify-between gap-5 sm:flex-row">
+          <div>
+            <div className="eyebrow">Curated for you</div>
+            <h2 className="mt-5 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">
+              The beauty shelf, reimagined.
+            </h2>
+          </div>
+          <a
+            className="flex items-center gap-2 text-sm font-bold text-wine-700"
+            href="#contact"
+          >
+            Shop all products <I.ArrowRight size={16} />
+          </a>
+        </div>
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
+          {products.map((p, i) => (
+            <motion.article
+              {...reveal}
+              key={p.name}
+              className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-card"
+            >
+              <div
+                className="relative grid h-64 place-items-center overflow-hidden"
+                style={{
+                  background: `linear-gradient(145deg, ${p.c}55, ${p.c})`,
+                }}
+              >
+                <button
+                  aria-label={`Save ${p.name}`}
+                  className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-white"
+                >
+                  <I.Heart size={17} />
+                </button>
+                <div className={`product product-${i}`}>
+                  <span>AURA</span>
+                </div>
+              </div>
+              <div className="p-5">
+                <p className="text-[10px] font-bold tracking-[.18em] text-stone-400">
+                  {p.type}
+                </p>
+                <div className="mt-2 flex items-end justify-between">
+                  <div>
+                    <h3 className="font-bold">{p.name}</h3>
+                    <div className="mt-2 flex text-[#c18c35]">
+                      {[1, 2, 3, 4, 5].map((x) => (
+                        <I.Star key={x} size={12} fill="currentColor" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-lg font-bold text-wine-700">{p.price}</p>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Salons() {
+  return (
+    <section id="salons" className="section bg-white">
+      <div className="wrap grid gap-14 lg:grid-cols-[.9fr_1.1fr]">
+        <motion.div {...reveal}>
+          <div className="eyebrow">
+            <I.Store size={14} /> Aura for business
+          </div>
+          <h2 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">
+            Grow your salon. We’ll handle the busywork.
+          </h2>
+          <p className="mt-5 leading-7 text-stone-600">
+            One elegant dashboard to fill your calendar, build your reputation
+            and turn new customers into loyal regulars.
+          </p>
+          <a className="btn-primary mt-8" href="#contact">
+            Partner with Aura <I.ArrowUpRight size={17} />
+          </a>
+        </motion.div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            [
+              I.LayoutDashboard,
+              "Simpler bookings",
+              "Manage schedules, appointments and cancellations at a glance.",
+            ],
+            [
+              I.Megaphone,
+              "Smarter promotion",
+              "Create offers and get discovered by people nearby.",
+            ],
+            [
+              I.Users,
+              "More customers",
+              "Reach thousands of beauty lovers actively looking to book.",
+            ],
+            [
+              I.BadgeCheck,
+              "Stronger reputation",
+              "Showcase your specialists, portfolios and verified reviews.",
+            ],
+          ].map(([Icon, t, d]) => (
+            <motion.div
+              {...reveal}
+              className="rounded-2xl border border-stone-100 p-6 hover:border-wine-200 hover:shadow-card"
+              key={t}
+            >
+              <Icon className="text-wine-700" />
+              <h3 className="mt-5 font-bold">{t}</h3>
+              <p className="mt-2 text-sm leading-6 text-stone-500">{d}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section className="section bg-cream">
+      <div className="wrap">
+        <SectionTitle
+          tag="Real people, real glow"
+          title="Loved by customers and salons."
+        />
+        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          {[
+            [
+              "Aura makes booking my self-care appointments almost too easy. I found my favorite stylist through the app.",
+              "Maya H.",
+              "Aura customer",
+            ],
+            [
+              "Home service is a lifesaver. My makeup artist arrived exactly on time and the whole experience felt so professional.",
+              "Sara A.",
+              "Aura customer",
+            ],
+            [
+              "Our quieter weekdays are finally filling up. Aura has helped new clients discover us without adding admin work.",
+              "Rania K.",
+              "Salon owner",
+            ],
+          ].map(([q, n, r], i) => (
+            <motion.figure
+              {...reveal}
+              key={n}
+              className={`rounded-2xl p-7 ${i === 1 ? "bg-wine-700 text-white" : "bg-white"}`}
+            >
+              <div
+                className={`flex ${i === 1 ? "text-[#f0c46b]" : "text-[#c18c35]"}`}
+              >
+                {[1, 2, 3, 4, 5].map((x) => (
+                  <I.Star key={x} size={15} fill="currentColor" />
+                ))}
+              </div>
+              <blockquote className="mt-6 text-lg leading-8">“{q}”</blockquote>
+              <figcaption className="mt-7 flex items-center gap-3">
+                <div
+                  className={`grid h-11 w-11 place-items-center rounded-full text-sm font-bold ${i === 1 ? "bg-white/15" : "bg-wine-50 text-wine-700"}`}
+                >
+                  {n[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-bold">{n}</p>
+                  <p
+                    className={`text-xs ${i === 1 ? "text-white/55" : "text-stone-400"}`}
+                  >
+                    {r}
+                  </p>
+                </div>
+              </figcaption>
+            </motion.figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA() {
+  return (
+    <section id="contact" className="px-4 py-16 sm:px-6">
+      <motion.div
+        {...reveal}
+        className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-wine-800 px-6 py-20 text-center text-white sm:px-10"
+      >
+        <div className="orb -left-20 -top-32 h-80 w-80 bg-wine-500/40" />
+        <div className="orb -bottom-40 -right-20 h-96 w-96 bg-[#a97267]/30" />
+        <div className="relative">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white/10">
+            <I.Sparkles />
+          </div>
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-semibold tracking-[-.04em] sm:text-5xl">
+            Your next beauty moment is closer than you think.
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-white/65">
+            Join Aura today and make every appointment, product and beauty
+            discovery feel effortless.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <a
+              href="#home"
+              className="btn bg-white text-wine-800 hover:bg-blush"
+            >
+              Get started free <I.ArrowRight size={17} />
+            </a>
+            <a
+              href="mailto:hello@aura.beauty"
+              className="btn border border-white/20 text-white hover:bg-white/10"
+            >
+              Talk to our team
+            </a>
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="bg-[#211a1c] pb-8 pt-16 text-white">
+      <div className="wrap">
+        <div className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-2 lg:grid-cols-5">
+          <div className="lg:col-span-2">
+            <Logo light />
+            <p className="mt-5 max-w-xs text-sm leading-6 text-white/50">
+              A smarter, more personal way to discover, book and enjoy beauty.
+            </p>
+            <div className="mt-6 flex gap-2">
+              {[I.Instagram, I.Facebook, I.Linkedin].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  aria-label="Social link"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/60 hover:bg-white hover:text-wine-800"
+                >
+                  <Icon size={16} />
+                </a>
+              ))}
+            </div>
+          </div>
+          {[
+            [
+              "Platform",
+              "Explore salons",
+              "Home services",
+              "Marketplace",
+              "Aura AI",
+            ],
+            [
+              "Business",
+              "For salons",
+              "Partner with us",
+              "Business login",
+              "Resources",
+            ],
+            ["Support", "Help center", "Contact us", "Privacy", "Terms"],
+          ].map(([h, ...links]) => (
+            <div key={h}>
+              <h3 className="text-sm font-bold">{h}</h3>
+              <div className="mt-5 space-y-3">
+                {links.map((x) => (
+                  <a
+                    className="block text-sm text-white/50 hover:text-white"
+                    href="#"
+                    key={x}
+                  >
+                    {x}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-3 pt-6 text-xs text-white/35 sm:flex-row sm:justify-between">
+          <p>© 2026 Aura Beauty Technologies. All rights reserved.</p>
+          <p>Made with care for your glow.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+function Field({ label, error, children }) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-semibold text-ink">
+        {label}
+      </label>
+      {children}
+      {error && (
+        <p
+          className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-700"
+          role="alert"
+        >
+          <I.CircleAlert size={13} />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function LoginPage() {
+  const { user, isAuthenticated, isReady, login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState(false);
+  React.useEffect(() => {
+    if (isReady && isAuthenticated && !success)
+      navigate(`/dashboard?role=${user.role}`, { replace: true });
+  }, [isReady, isAuthenticated, success, user]);
+  const validate = () => {
+    const next = {};
+    if (!email.trim()) next.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      next.email = "Enter a valid email address.";
+    if (!password) next.password = "Password is required.";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setErrors({});
+    try {
+      const authenticatedUser = await login(
+        email.trim().toLowerCase(),
+        password,
+      );
+      setSuccess(true);
+      const returnTo = localStorage.getItem("auraReturnTo");
+      localStorage.removeItem("auraReturnTo");
+      setTimeout(
+        () =>
+          navigate(returnTo || `/dashboard?role=${authenticatedUser.role}`, {
+            replace: true,
+          }),
+        650,
+      );
+    } catch (error) {
+      setErrors({
+        auth:
+          error?.message ||
+          "Unable to sign in. Please check your details and try again.",
+      });
+    }
+  };
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-cream">
+      <div className="orb -left-40 -top-40 h-[430px] w-[430px] bg-blush/70" />
+      <div className="orb -bottom-48 -right-32 h-[500px] w-[500px] bg-wine-100/80" />
+      <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[.9fr_1.1fr]">
+        <section className="relative hidden overflow-hidden bg-wine-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+          <Logo light href="/" />
+          <div className="relative z-10">
+            <div className="eyebrow border-white/15 bg-white/10 text-white">
+              <I.Sparkles size={14} /> Beauty, beautifully simple
+            </div>
+            <h2 className="mt-7 max-w-md font-display text-5xl font-semibold leading-tight tracking-[-.045em]">
+              Your next beauty moment starts here.
+            </h2>
+            <p className="mt-5 max-w-md leading-7 text-white/60">
+              Book trusted specialists, manage appointments and keep your entire
+              beauty routine beautifully organized.
+            </p>
+          </div>
+          <div className="relative z-10 flex items-center gap-3 text-sm text-white/55">
+            <I.ShieldCheck size={18} /> Secure sign-in · Your privacy protected
+          </div>
+          <div className="orb -bottom-32 -right-24 h-80 w-80 bg-wine-500/40" />
+        </section>
+        <section className="relative z-10 flex items-center justify-center px-5 py-10 sm:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-md"
+          >
+            <div className="mb-10 flex justify-center lg:hidden">
+              <Logo href="/" />
+            </div>
+            <a
+              href="/"
+              className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-wine-700"
+            >
+              <I.ArrowLeft size={16} /> Back to Aura
+            </a>
+            <h1 className="font-display text-4xl font-semibold tracking-[-.04em] text-ink sm:text-5xl">
+              Welcome Back
+            </h1>
+            <p className="mt-3 text-stone-500">
+              Sign in to continue your beauty journey with Aura.
+            </p>
+            {success && (
+              <div
+                className="mt-6 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"
+                role="status"
+              >
+                <I.CheckCircle2 size={19} /> Signed in successfully. Opening
+                your dashboard…
+              </div>
+            )}
+            {errors.auth && (
+              <div
+                className="mt-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"
+                role="alert"
+              >
+                <I.CircleAlert size={18} />
+                {errors.auth}
+              </div>
+            )}
+            <form onSubmit={submit} noValidate className="mt-8 space-y-5">
+              <Field label="Email address" error={errors.email}>
+                <div
+                  className={`flex items-center rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-wine-200 ${errors.email ? "border-red-400" : "border-stone-200 focus-within:border-wine-500"}`}
+                >
+                  <I.Mail size={18} className="text-stone-400" />
+                  <input
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors({ ...errors, email: null, auth: null });
+                    }}
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="w-full bg-transparent px-3 py-3.5 text-sm outline-none"
+                    aria-invalid={!!errors.email}
+                  />
+                </div>
+              </Field>
+              <Field label="Password" error={errors.password}>
+                <div
+                  className={`flex items-center rounded-xl border bg-white px-4 transition focus-within:ring-2 focus-within:ring-wine-200 ${errors.password ? "border-red-400" : "border-stone-200 focus-within:border-wine-500"}`}
+                >
+                  <I.LockKeyhole size={18} className="text-stone-400" />
+                  <input
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors({ ...errors, password: null, auth: null });
+                    }}
+                    type={show ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    className="w-full bg-transparent px-3 py-3.5 text-sm outline-none"
+                    aria-invalid={!!errors.password}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    className="p-1 text-stone-400 hover:text-wine-700"
+                    aria-label={show ? "Hide password" : "Show password"}
+                  >
+                    {show ? <I.EyeOff size={18} /> : <I.Eye size={18} />}
+                  </button>
+                </div>
+              </Field>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <label className="flex cursor-pointer items-center gap-2 text-stone-600">
+                  <input
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-stone-300 accent-[#642735]"
+                  />
+                  Remember me
+                </label>
+                <a
+                  href="#"
+                  className="font-semibold text-wine-700 hover:text-wine-900"
+                >
+                  Forgot Password?
+                </a>
+              </div>
+              <button
+                type="submit"
+                disabled={success}
+                className="btn-primary w-full disabled:cursor-wait disabled:opacity-70"
+              >
+                {success ? "Signing in…" : "Sign In"}
+                {!success && <I.ArrowRight size={17} />}
+              </button>
+            </form>
+            <div className="my-7 flex items-center gap-4">
+              <span className="h-px flex-1 bg-stone-200" />
+              <span className="text-xs text-stone-400">or continue with</span>
+              <span className="h-px flex-1 bg-stone-200" />
+            </div>
+            <button type="button" className="btn-secondary w-full">
+              <span className="grid h-5 w-5 place-items-center rounded-full bg-white text-sm font-bold text-[#4285f4]">
+                G
+              </span>
+              Continue with Google
+            </button>
+            <p className="mt-7 text-center text-sm text-stone-500">
+              Don't have an account?{" "}
+              <a
+                href="#"
+                className="font-bold text-wine-700 hover:text-wine-900"
+              >
+                Create Account
+              </a>
+            </p>
+            <p className="mt-8 text-center text-xs text-stone-400">
+              Secure authentication powered by Supabase
+            </p>
+          </motion.div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+const dashboardData = {
+  customer: {
+    label: "Customer",
+    greeting: "Your beauty, beautifully organized.",
+    metrics: [
+      ["2", "Upcoming bookings"],
+      ["350", "Aura points"],
+      ["1", "Order in transit"],
+    ],
+    actions: [
+      [I.Search, "Discover salons"],
+      [I.CalendarDays, "My appointments"],
+      [I.ShoppingBag, "Shop beauty"],
+    ],
+    activity: "Glow facial with Layla · Tomorrow, 10:30 AM",
+  },
+  specialist: {
+    label: "Specialist",
+    greeting: "Make every appointment exceptional.",
+    metrics: [
+      ["6", "Today’s clients"],
+      ["4.9", "Average rating"],
+      ["$840", "This week"],
+    ],
+    actions: [
+      [I.CalendarClock, "Manage schedule"],
+      [I.Users, "Client list"],
+      [I.Star, "View reviews"],
+    ],
+    activity: "Next: Maya H. · Glow facial · 10:30 AM",
+  },
+  owner: {
+    label: "Salon Owner",
+    greeting: "A clearer view of your growing business.",
+    metrics: [
+      ["18", "Today’s bookings"],
+      ["$2.4k", "Weekly revenue"],
+      ["92%", "Chair utilization"],
+    ],
+    actions: [
+      [I.LayoutDashboard, "Booking manager"],
+      [I.UserRoundCheck, "Specialists"],
+      [I.Megaphone, "Create promotion"],
+    ],
+    activity: "Luna Beauty Studio is 92% booked today",
+  },
+  admin: {
+    label: "Administrator",
+    greeting: "Keep the Aura ecosystem running beautifully.",
+    metrics: [
+      ["1,248", "Active users"],
+      ["54", "Partner salons"],
+      ["99.9%", "Platform health"],
+    ],
+    actions: [
+      [I.ShieldCheck, "Review approvals"],
+      [I.Store, "Manage salons"],
+      [I.MessagesSquare, "Support queue"],
+    ],
+    activity: "3 new salon applications need review",
+  },
+};
+function RoleDashboardPage() {
+  const { user, logout } = useAuth();
+  const data = dashboardData[user.role] || dashboardData.customer;
+  const leave = () => {
+    logout();
+    navigate("/");
+  };
+  return (
+    <main className="min-h-screen bg-[#f7f2ec]">
+      <header className="border-b border-wine-900/5 bg-white">
+        <div className="wrap flex h-20 items-center justify-between">
+          <Logo href="/" />
+          <AccountMenu />
+        </div>
+      </header>
+      <div className="wrap py-10 sm:py-14">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div>
+            <div className="eyebrow">
+              <I.Sparkles size={13} />
+              {data.label} workspace
+            </div>
+            <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
+              Welcome back, {user.name}.
+            </h1>
+            <p className="mt-3 text-stone-500">{data.greeting}</p>
+          </div>
+          <button onClick={leave} className="btn-secondary self-start">
+            <I.LogOut size={16} />
+            Sign out
+          </button>
+        </div>
+        <section className="mt-10 grid gap-4 sm:grid-cols-3">
+          {data.metrics.map(([value, label]) => (
+            <article key={label} className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="font-display text-3xl font-bold text-wine-700">
+                {value}
+              </p>
+              <p className="mt-2 text-sm text-stone-500">{label}</p>
+            </article>
+          ))}
+        </section>
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.25fr_.75fr]">
+          <section className="rounded-2xl bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[.15em] text-wine-600">
+              Quick actions
+            </p>
+            <h2 className="mt-2 text-xl font-bold">
+              What would you like to do?
+            </h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <a
+                href="/salons"
+                className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"
+              >
+                <I.Search size={20} className="text-wine-700" />
+                <span className="mt-4 block text-sm font-bold">
+                  Discover salons
+                </span>
+              </a>
+              <a
+                href="/my-bookings"
+                className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"
+              >
+                <I.CalendarDays size={20} className="text-wine-700" />
+                <span className="mt-4 block text-sm font-bold">
+                  My appointments
+                </span>
+              </a>
+              <a
+                href="/profile"
+                className="group rounded-xl border border-stone-100 p-4 hover:border-wine-200 hover:bg-wine-50"
+              >
+                <I.UserRound size={20} className="text-wine-700" />
+                <span className="mt-4 block text-sm font-bold">My profile</span>
+              </a>
+            </div>
+          </section>
+          <aside className="rounded-2xl bg-wine-800 p-6 text-white shadow-sm">
+            <I.BellRing size={20} />
+            <p className="mt-6 text-xs font-bold uppercase tracking-[.15em] text-white/50">
+              Latest update
+            </p>
+            <p className="mt-3 text-lg font-semibold leading-7">
+              {data.activity}
+            </p>
+          </aside>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export function DashboardPage() {
+  const { user } = useAuth();
+  return user.role === "customer" ? (
+    <CustomerDashboard />
+  ) : (
+    <RoleDashboardPage />
+  );
+}
+
+export function ProfilePage() {
+  const { user } = useAuth();
+  const fields = [
+    ["Name", user.name],
+    ["Email", user.email],
+    ["Phone", user.phone || "Not added"],
+    ["Account type", dashboardData[user.role]?.label || "Customer"],
+  ];
+  return (
+    <main className="min-h-screen bg-[#f7f2ec]">
+      <header className="border-b border-wine-900/5 bg-white">
+        <div className="wrap flex h-20 items-center justify-between">
+          <Logo href="/" />
+          <AccountMenu />
+        </div>
+      </header>
+      <section className="wrap py-10 sm:py-14">
+        <div className="eyebrow">
+          <I.UserRound size={13} />
+          Aura account
+        </div>
+        <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
+          My Profile
+        </h1>
+        <p className="mt-3 text-stone-500">
+          Manage your personal details and account information.
+        </p>
+        <div className="mt-9 max-w-2xl overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-card">
+          <div className="flex items-center gap-4 bg-wine-800 p-6 text-white">
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-white/15 text-2xl font-bold">
+              {user.name[0]}
+            </div>
+            <div>
+              <h2 className="font-display text-2xl font-bold">{user.name}</h2>
+              <p className="mt-1 text-sm text-white/60">
+                {dashboardData[user.role]?.label || "Customer"} account
+              </p>
+            </div>
+          </div>
+          <dl className="divide-y divide-stone-100 p-6">
+            {fields.map(([label, value]) => (
+              <div
+                key={label}
+                className="grid gap-1 py-4 sm:grid-cols-[150px_1fr]"
+              >
+                <dt className="text-sm text-stone-400">{label}</dt>
+                <dd className="font-semibold">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <div id="settings" className="border-t border-stone-100 p-6">
+            <h3 className="font-bold">Account settings</h3>
+            <p className="mt-2 text-sm text-stone-500">
+              Profile editing and notification preferences will be connected
+              with the Aura backend.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default function App() {
+  const [path, setPath] = useState(() =>
+    typeof window === "undefined" ? "/" : window.location.pathname,
+  );
+  React.useEffect(() => {
+    const sync = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, []);
+  if (path === "/login") return <LoginPage />;
+  if (path === "/dashboard")
+    return (
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    );
+  if (path === "/my-bookings")
+    return (
+      <ProtectedRoute>
+        <MyBookingsPage />
+      </ProtectedRoute>
+    );
+  if (path === "/profile")
+    return (
+      <ProtectedRoute>
+        <ProfilePage />
+      </ProtectedRoute>
+    );
+  if (path === "/favorites")
+    return (
+      <ProtectedRoute>
+        <FavoritesPage />
+      </ProtectedRoute>
+    );
+  if (path === "/notifications")
+    return (
+      <ProtectedRoute>
+        <NotificationsPage />
+      </ProtectedRoute>
+    );
+  if (path === "/salons") return <AdvancedSalonDiscoveryPage />;
+  if (path.startsWith("/salons/"))
+    return <SalonDetailsPage id={path.split("/")[2]} />;
+  if (path.startsWith("/booking/"))
+    return (
+      <ProtectedRoute>
+        <BookingPage id={path.split("/")[2]} />
+      </ProtectedRoute>
+    );
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Stats />
+        <Features />
+        <How />
+        <Assistant />
+        <HomeService />
+        <Marketplace />
+        <Salons />
+        <Testimonials />
+        <FinalCTA />
+      </main>
+      <Footer />
+    </>
+  );
+}

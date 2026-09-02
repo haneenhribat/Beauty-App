@@ -1,89 +1,1898 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Banknote, CalendarCheck, Check, CheckCircle2, ChevronDown, Clock3, CreditCard, Filter, Heart, House, MapPin, MapPinned, Navigation, Search, ShieldCheck, SlidersHorizontal, Sparkles, Star, Store, UserRound, UsersRound, WalletCards, X } from 'lucide-react'
-import { useAuth } from './context/AuthContext.jsx'
-import { createBookingFromSelection, getSalonDetails, getSalons } from './lib/aura-api.js'
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Banknote,
+  CalendarCheck,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  CreditCard,
+  Filter,
+  Heart,
+  House,
+  MapPin,
+  MapPinned,
+  Navigation,
+  Search,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  Star,
+  Store,
+  UserRound,
+  UsersRound,
+  WalletCards,
+  X,
+} from "lucide-react";
+import { useAuth } from "./context/AuthContext.jsx";
+import {
+  createBookingFromSelection,
+  getSalonDetails,
+  getSalons,
+} from "./lib/aura-api.js";
 
 export const salons = [
-  {id:'luna-beauty',name:'Luna Beauty Studio',location:'Al-Masyoun, Ramallah',area:'Ramallah',rating:4.9,reviews:284,services:['Hair','Nails','Makeup'],category:'Hair',price:3,distance:0.8,open:true,home:true,image:'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=85'},
-  {id:'muse-studio',name:'Muse Nail & Beauty Bar',location:'Al-Tira, Ramallah',area:'Ramallah',rating:4.8,reviews:196,services:['Nails','Brows','Lashes'],category:'Nails',price:2,distance:1.3,open:true,home:false,image:'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=1200&q=85'},
-  {id:'maison-glow',name:'Maison Glow',location:'Rafidia, Nablus',area:'Nablus',rating:4.9,reviews:342,services:['Facials','Skincare','Massage'],category:'Skincare',price:4,distance:2.1,open:false,home:true,image:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1200&q=85'},
-  {id:'velvet-room',name:'The Velvet Room',location:'Ein Sarah, Hebron',area:'Hebron',rating:4.7,reviews:158,services:['Hair color','Styling','Treatments'],category:'Hair',price:3,distance:3.4,open:true,home:true,image:'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1200&q=85'},
-  {id:'noura-beauty',name:'Noura Beauty House',location:'Bethlehem Center',area:'Bethlehem',rating:4.6,reviews:121,services:['Makeup','Bridal','Hair'],category:'Makeup',price:2,distance:4.2,open:true,home:true,image:'https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?auto=format&fit=crop&w=1200&q=85'},
-  {id:'serene-spa',name:'Serene Ritual Spa',location:'Al-Irsal, Ramallah',area:'Ramallah',rating:4.8,reviews:217,services:['Massage','Hammam','Facials'],category:'Spa',price:4,distance:1.9,open:false,home:false,image:'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=85'},
-  {id:'blush-brow',name:'Blush Brow Atelier',location:'Old City, Nablus',area:'Nablus',rating:4.5,reviews:89,services:['Brows','Lashes','Threading'],category:'Brows',price:1,distance:5.6,open:true,home:false,image:'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=85'},
-  {id:'olive-organic',name:'Olive Organic Beauty',location:'Beit Jala, Bethlehem',area:'Bethlehem',rating:4.7,reviews:174,services:['Natural hair','Skincare','Nails'],category:'Skincare',price:2,distance:6.8,open:true,home:true,image:'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=85'},
-]
+  {
+    id: "luna-beauty",
+    name: "Luna Beauty Studio",
+    location: "Al-Masyoun, Ramallah",
+    area: "Ramallah",
+    rating: 4.9,
+    reviews: 284,
+    services: ["Hair", "Nails", "Makeup"],
+    category: "Hair",
+    price: 3,
+    distance: 0.8,
+    open: true,
+    home: true,
+    image:
+      "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "muse-studio",
+    name: "Muse Nail & Beauty Bar",
+    location: "Al-Tira, Ramallah",
+    area: "Ramallah",
+    rating: 4.8,
+    reviews: 196,
+    services: ["Nails", "Brows", "Lashes"],
+    category: "Nails",
+    price: 2,
+    distance: 1.3,
+    open: true,
+    home: false,
+    image:
+      "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "maison-glow",
+    name: "Maison Glow",
+    location: "Rafidia, Nablus",
+    area: "Nablus",
+    rating: 4.9,
+    reviews: 342,
+    services: ["Facials", "Skincare", "Massage"],
+    category: "Skincare",
+    price: 4,
+    distance: 2.1,
+    open: false,
+    home: true,
+    image:
+      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "velvet-room",
+    name: "The Velvet Room",
+    location: "Ein Sarah, Hebron",
+    area: "Hebron",
+    rating: 4.7,
+    reviews: 158,
+    services: ["Hair color", "Styling", "Treatments"],
+    category: "Hair",
+    price: 3,
+    distance: 3.4,
+    open: true,
+    home: true,
+    image:
+      "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "noura-beauty",
+    name: "Noura Beauty House",
+    location: "Bethlehem Center",
+    area: "Bethlehem",
+    rating: 4.6,
+    reviews: 121,
+    services: ["Makeup", "Bridal", "Hair"],
+    category: "Makeup",
+    price: 2,
+    distance: 4.2,
+    open: true,
+    home: true,
+    image:
+      "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "serene-spa",
+    name: "Serene Ritual Spa",
+    location: "Al-Irsal, Ramallah",
+    area: "Ramallah",
+    rating: 4.8,
+    reviews: 217,
+    services: ["Massage", "Hammam", "Facials"],
+    category: "Spa",
+    price: 4,
+    distance: 1.9,
+    open: false,
+    home: false,
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "blush-brow",
+    name: "Blush Brow Atelier",
+    location: "Old City, Nablus",
+    area: "Nablus",
+    rating: 4.5,
+    reviews: 89,
+    services: ["Brows", "Lashes", "Threading"],
+    category: "Brows",
+    price: 1,
+    distance: 5.6,
+    open: true,
+    home: false,
+    image:
+      "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=85",
+  },
+  {
+    id: "olive-organic",
+    name: "Olive Organic Beauty",
+    location: "Beit Jala, Bethlehem",
+    area: "Bethlehem",
+    rating: 4.7,
+    reviews: 174,
+    services: ["Natural hair", "Skincare", "Nails"],
+    category: "Skincare",
+    price: 2,
+    distance: 6.8,
+    open: true,
+    home: true,
+    image:
+      "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1200&q=85",
+  },
+];
 
-const categories=['All services','Hair','Nails','Skincare','Makeup','Lashes','Spa','Brows']
-const priceLabel=n=>'$'.repeat(n)
-const inputClass='h-12 w-full rounded-xl border border-stone-200 bg-white px-4 text-sm text-ink outline-none transition focus:border-wine-500 focus:ring-2 focus:ring-wine-100'
+const categories = [
+  "All services",
+  "Hair",
+  "Nails",
+  "Skincare",
+  "Makeup",
+  "Lashes",
+  "Spa",
+  "Brows",
+];
+const priceLabel = (n) => "$".repeat(n);
+const inputClass =
+  "h-12 w-full rounded-xl border border-stone-200 bg-white px-4 text-sm text-ink outline-none transition focus:border-wine-500 focus:ring-2 focus:ring-wine-100";
 
 export function mapDatabaseSalon(salon, index) {
-  const ratings = salon.reviews?.map(review => Number(review.rating)) || []
-  const serviceNames = [...new Set((salon.services || []).map(service => service.category))]
+  const ratings = salon.reviews?.map((review) => Number(review.rating)) || [];
+  const serviceNames = [
+    ...new Set((salon.services || []).map((service) => service.category)),
+  ];
   return {
     dbId: salon.id,
     id: salon.slug,
     name: salon.name,
     location: `${salon.address}, ${salon.city}`,
     area: salon.city,
-    rating: ratings.length ? Number((ratings.reduce((sum,value)=>sum+value,0)/ratings.length).toFixed(1)) : 0,
+    rating: ratings.length
+      ? Number(
+          (
+            ratings.reduce((sum, value) => sum + value, 0) / ratings.length
+          ).toFixed(1),
+        )
+      : 0,
     reviews: ratings.length,
-    services: serviceNames.length ? serviceNames.slice(0,3) : ['Services coming soon'],
-    category: serviceNames[0] || 'All services',
+    services: serviceNames.length
+      ? serviceNames.slice(0, 3)
+      : ["Services coming soon"],
+    category: serviceNames[0] || "All services",
     price: salon.price_level || 2,
     distance: Number((0.8 + index * 0.55).toFixed(1)),
     open: salon.is_open,
     home: salon.offers_home_service,
     image: salon.image_url,
-  }
+  };
 }
 
-export function SalonSearchBar({query,setQuery,location,setLocation}){return <div className="grid gap-3 rounded-2xl bg-white p-3 shadow-card sm:grid-cols-[1fr_.55fr_auto]"><label className="relative"><span className="sr-only">Search by salon or service</span><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"/><input className={`${inputClass} pl-11`} value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search salon name or service"/></label><label className="relative"><span className="sr-only">Select location</span><MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"/><select className={`${inputClass} appearance-none pl-11 pr-9`} value={location} onChange={e=>setLocation(e.target.value)}><option>All locations</option><option>Ramallah</option><option>Nablus</option><option>Bethlehem</option><option>Hebron</option></select><ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-stone-400"/></label><button className="btn-primary rounded-xl px-7"><Search size={17}/>Search</button></div>}
+export function SalonSearchBar({ query, setQuery, location, setLocation }) {
+  return (
+    <div className="grid gap-3 rounded-2xl bg-white p-3 shadow-card sm:grid-cols-[1fr_.55fr_auto]">
+      <label className="relative">
+        <span className="sr-only">Search by salon or service</span>
+        <Search
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"
+        />
+        <input
+          className={`${inputClass} pl-11`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search salon name or service"
+        />
+      </label>
+      <label className="relative">
+        <span className="sr-only">Select location</span>
+        <MapPin
+          size={18}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"
+        />
+        <select
+          className={`${inputClass} appearance-none pl-11 pr-9`}
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        >
+          <option>All locations</option>
+          <option>Ramallah</option>
+          <option>Nablus</option>
+          <option>Bethlehem</option>
+          <option>Hebron</option>
+        </select>
+        <ChevronDown
+          size={16}
+          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-stone-400"
+        />
+      </label>
+      <button className="btn-primary rounded-xl px-7">
+        <Search size={17} />
+        Search
+      </button>
+    </div>
+  );
+}
 
-function Toggle({checked,onChange,label}){return <label className="flex cursor-pointer items-center justify-between gap-4 text-sm font-medium text-stone-600"><span>{label}</span><button type="button" role="switch" aria-checked={checked} onClick={()=>onChange(!checked)} className={`relative h-6 w-11 rounded-full transition ${checked?'bg-wine-700':'bg-stone-200'}`}><span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition ${checked?'left-6':'left-1'}`}/></button></label>}
-export function SalonFilters({filters,setFilters,onClear}){const set=(key,value)=>setFilters(f=>({...f,[key]:value}));return <div className="space-y-6"><div className="flex items-center justify-between"><h2 className="flex items-center gap-2 font-bold"><SlidersHorizontal size={18} className="text-wine-700"/>Filters</h2><button onClick={onClear} className="text-xs font-bold text-wine-700">Clear all</button></div><label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-wider text-stone-400">Service category</span><select className={inputClass} value={filters.category} onChange={e=>set('category',e.target.value)}>{categories.map(x=><option key={x}>{x}</option>)}</select></label><div><span className="mb-3 block text-xs font-bold uppercase tracking-wider text-stone-400">Minimum rating</span><div className="grid grid-cols-3 gap-2">{[0,4,4.5].map(x=><button key={x} onClick={()=>set('rating',x)} className={`rounded-lg border px-2 py-2 text-xs font-bold ${filters.rating===x?'border-wine-700 bg-wine-50 text-wine-700':'border-stone-200 text-stone-500'}`}>{x?`${x}+ ★`:'Any'}</button>)}</div></div><div><span className="mb-3 block text-xs font-bold uppercase tracking-wider text-stone-400">Price range</span><div className="grid grid-cols-4 gap-2">{[0,1,2,3].map(x=><button key={x} onClick={()=>set('price',x)} className={`rounded-lg border py-2 text-xs font-bold ${filters.price===x?'border-wine-700 bg-wine-50 text-wine-700':'border-stone-200 text-stone-500'}`}>{x?'$'.repeat(x):'Any'}</button>)}</div></div><div className="space-y-4 border-t border-stone-100 pt-5"><Toggle label="Home services" checked={filters.home} onChange={v=>set('home',v)}/><Toggle label="Open now" checked={filters.open} onChange={v=>set('open',v)}/></div></div>}
-export function SortDropdown({value,onChange}){return <label className="relative flex items-center gap-2"><span className="hidden text-sm text-stone-400 sm:inline">Sort by</span><select className="h-10 appearance-none rounded-lg border border-stone-200 bg-white pl-3 pr-8 text-sm font-semibold outline-none focus:border-wine-500" value={value} onChange={e=>onChange(e.target.value)}><option>Recommended</option><option>Highest Rated</option><option>Nearest</option><option>Price</option></select><ChevronDown size={14} className="pointer-events-none absolute right-3 text-stone-400"/></label>}
+function Toggle({ checked, onChange, label }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-4 text-sm font-medium text-stone-600">
+      <span>{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative h-6 w-11 rounded-full transition ${checked ? "bg-wine-700" : "bg-stone-200"}`}
+      >
+        <span
+          className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition ${checked ? "left-6" : "left-1"}`}
+        />
+      </button>
+    </label>
+  );
+}
+export function SalonFilters({ filters, setFilters, onClear }) {
+  const set = (key, value) => setFilters((f) => ({ ...f, [key]: value }));
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-bold">
+          <SlidersHorizontal size={18} className="text-wine-700" />
+          Filters
+        </h2>
+        <button onClick={onClear} className="text-xs font-bold text-wine-700">
+          Clear all
+        </button>
+      </div>
+      <label className="block">
+        <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-stone-400">
+          Service category
+        </span>
+        <select
+          className={inputClass}
+          value={filters.category}
+          onChange={(e) => set("category", e.target.value)}
+        >
+          {categories.map((x) => (
+            <option key={x}>{x}</option>
+          ))}
+        </select>
+      </label>
+      <div>
+        <span className="mb-3 block text-xs font-bold uppercase tracking-wider text-stone-400">
+          Minimum rating
+        </span>
+        <div className="grid grid-cols-3 gap-2">
+          {[0, 4, 4.5].map((x) => (
+            <button
+              key={x}
+              onClick={() => set("rating", x)}
+              className={`rounded-lg border px-2 py-2 text-xs font-bold ${filters.rating === x ? "border-wine-700 bg-wine-50 text-wine-700" : "border-stone-200 text-stone-500"}`}
+            >
+              {x ? `${x}+ ★` : "Any"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <span className="mb-3 block text-xs font-bold uppercase tracking-wider text-stone-400">
+          Price range
+        </span>
+        <div className="grid grid-cols-4 gap-2">
+          {[0, 1, 2, 3].map((x) => (
+            <button
+              key={x}
+              onClick={() => set("price", x)}
+              className={`rounded-lg border py-2 text-xs font-bold ${filters.price === x ? "border-wine-700 bg-wine-50 text-wine-700" : "border-stone-200 text-stone-500"}`}
+            >
+              {x ? "$".repeat(x) : "Any"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-4 border-t border-stone-100 pt-5">
+        <Toggle
+          label="Home services"
+          checked={filters.home}
+          onChange={(v) => set("home", v)}
+        />
+        <Toggle
+          label="Open now"
+          checked={filters.open}
+          onChange={(v) => set("open", v)}
+        />
+      </div>
+    </div>
+  );
+}
+export function SortDropdown({ value, onChange }) {
+  return (
+    <label className="relative flex items-center gap-2">
+      <span className="hidden text-sm text-stone-400 sm:inline">Sort by</span>
+      <select
+        className="h-10 appearance-none rounded-lg border border-stone-200 bg-white pl-3 pr-8 text-sm font-semibold outline-none focus:border-wine-500"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option>Recommended</option>
+        <option>Highest Rated</option>
+        <option>Nearest</option>
+        <option>Price</option>
+      </select>
+      <ChevronDown
+        size={14}
+        className="pointer-events-none absolute right-3 text-stone-400"
+      />
+    </label>
+  );
+}
 
-export function SalonCard({salon,favorite,onFavorite,onView}){return <motion.article layout initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} className="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-card"><div className="relative h-52 overflow-hidden bg-stone-100"><img src={salon.image} alt={`${salon.name} interior`} className="h-full w-full object-cover transition duration-500 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"/><button onClick={()=>onFavorite(salon.id)} aria-label={favorite?'Remove from favorites':'Add to favorites'} className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-wine-700 shadow backdrop-blur hover:bg-white"><Heart size={18} fill={favorite?'currentColor':'none'}/></button>{salon.home&&<span className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-wine-700 backdrop-blur"><House size={12}/>Home service</span>}</div><div className="p-5"><div className="flex items-start justify-between gap-3"><div><h3 className="font-display text-xl font-bold tracking-[-.025em]">{salon.name}</h3><p className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500"><MapPin size={13}/>{salon.location}</p></div><div className="flex shrink-0 items-center gap-1 rounded-lg bg-[#fff8e8] px-2 py-1 text-xs font-bold text-[#9a6b16]"><Star size={13} fill="currentColor"/>{salon.rating||'New'}</div></div><div className="mt-4 flex flex-wrap gap-1.5">{salon.services.map(x=><span key={x} className="rounded-full bg-[#f7f2ec] px-2.5 py-1 text-[11px] font-semibold text-stone-600">{x}</span>)}</div><div className="mt-5 flex items-center justify-between border-t border-stone-100 pt-4 text-xs"><span className="font-bold text-wine-700">{priceLabel(salon.price)}</span><span className="text-stone-400">{salon.reviews} reviews</span><span className="flex items-center gap-1 text-stone-500"><Navigation size={12}/>{salon.distance} km</span><span className={`flex items-center gap-1.5 font-bold ${salon.open?'text-emerald-700':'text-stone-400'}`}><span className={`h-1.5 w-1.5 rounded-full ${salon.open?'bg-emerald-500':'bg-stone-300'}`}/>{salon.open?'Open':'Closed'}</span></div><div className="mt-4 flex items-center justify-between gap-2 rounded-xl bg-wine-50 px-3 py-2 text-xs"><span className="font-bold text-wine-700">Next available: {salon.nextAvailable||'Today at 3:30 PM'}</span>{salon.availableToday&&<span className="shrink-0 rounded-full bg-white px-2 py-1 font-bold text-emerald-700">Available Today</span>}</div><div className="mt-5 grid grid-cols-2 gap-2"><a onClick={onView} href={`/salons/${salon.id}`} className="btn-secondary rounded-xl px-3 py-3">View Salon</a><a href={`/booking/${salon.id}`} className="btn-primary rounded-xl px-3 py-3">Book Now</a></div></div></motion.article>}
-export function SalonGrid({items,favorites,toggleFavorite}){return <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{items.map(s=><SalonCard key={s.id} salon={s} favorite={favorites.has(s.id)} onFavorite={toggleFavorite}/>)}</div>}
-export function EmptyState({onClear}){return <div className="rounded-3xl border border-dashed border-wine-200 bg-white px-6 py-20 text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-wine-50 text-wine-700"><Search size={26}/></div><h2 className="mt-6 font-display text-2xl font-bold">No perfect match—yet.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">Try widening your location, changing a service, or clearing a few filters to see more salons.</p><button onClick={onClear} className="btn-primary mt-6">Clear filters</button></div>}
+export function SalonCard({ salon, favorite, onFavorite, onView }) {
+  return (
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-card"
+    >
+      <div className="relative h-52 overflow-hidden bg-stone-100">
+        <img
+          src={salon.image}
+          alt={`${salon.name} interior`}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+        <button
+          onClick={() => onFavorite(salon.id)}
+          aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+          className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-wine-700 shadow backdrop-blur hover:bg-white"
+        >
+          <Heart size={18} fill={favorite ? "currentColor" : "none"} />
+        </button>
+        {salon.home && (
+          <span className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-wine-700 backdrop-blur">
+            <House size={12} />
+            Home service
+          </span>
+        )}
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="font-display text-xl font-bold tracking-[-.025em]">
+              {salon.name}
+            </h3>
+            <p className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500">
+              <MapPin size={13} />
+              {salon.location}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1 rounded-lg bg-[#fff8e8] px-2 py-1 text-xs font-bold text-[#9a6b16]">
+            <Star size={13} fill="currentColor" />
+            {salon.rating || "New"}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {salon.services.map((x) => (
+            <span
+              key={x}
+              className="rounded-full bg-[#f7f2ec] px-2.5 py-1 text-[11px] font-semibold text-stone-600"
+            >
+              {x}
+            </span>
+          ))}
+        </div>
+        <div className="mt-5 flex items-center justify-between border-t border-stone-100 pt-4 text-xs">
+          <span className="font-bold text-wine-700">
+            {priceLabel(salon.price)}
+          </span>
+          <span className="text-stone-400">{salon.reviews} reviews</span>
+          <span className="flex items-center gap-1 text-stone-500">
+            <Navigation size={12} />
+            {salon.distance} km
+          </span>
+          <span
+            className={`flex items-center gap-1.5 font-bold ${salon.open ? "text-emerald-700" : "text-stone-400"}`}
+          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${salon.open ? "bg-emerald-500" : "bg-stone-300"}`}
+            />
+            {salon.open ? "Open" : "Closed"}
+          </span>
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-2 rounded-xl bg-wine-50 px-3 py-2 text-xs">
+          <span className="font-bold text-wine-700">
+            Next available: {salon.nextAvailable || "Today at 3:30 PM"}
+          </span>
+          {salon.availableToday && (
+            <span className="shrink-0 rounded-full bg-white px-2 py-1 font-bold text-emerald-700">
+              Available Today
+            </span>
+          )}
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <a
+            onClick={onView}
+            href={`/salons/${salon.id}`}
+            className="btn-secondary rounded-xl px-3 py-3"
+          >
+            View Salon
+          </a>
+          <a
+            href={`/booking/${salon.id}`}
+            className="btn-primary rounded-xl px-3 py-3"
+          >
+            Book Now
+          </a>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+export function SalonGrid({ items, favorites, toggleFavorite }) {
+  return (
+    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      {items.map((s) => (
+        <SalonCard
+          key={s.id}
+          salon={s}
+          favorite={favorites.has(s.id)}
+          onFavorite={toggleFavorite}
+        />
+      ))}
+    </div>
+  );
+}
+export function EmptyState({ onClear }) {
+  return (
+    <div className="rounded-3xl border border-dashed border-wine-200 bg-white px-6 py-20 text-center">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-wine-50 text-wine-700">
+        <Search size={26} />
+      </div>
+      <h2 className="mt-6 font-display text-2xl font-bold">
+        No perfect match—yet.
+      </h2>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
+        Try widening your location, changing a service, or clearing a few
+        filters to see more salons.
+      </p>
+      <button onClick={onClear} className="btn-primary mt-6">
+        Clear filters
+      </button>
+    </div>
+  );
+}
 
-export function SalonDiscoveryPage(){const [catalogSalons,setCatalogSalons]=useState([]);const [loading,setLoading]=useState(true);const [loadError,setLoadError]=useState('');const [query,setQuery]=useState('');const [location,setLocation]=useState('All locations');const [filters,setFilters]=useState(()=>({category:typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('category')||'All services',rating:0,price:0,home:typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('home')==='true',open:false}));const [sort,setSort]=useState('Recommended');const [favorites,setFavorites]=useState(new Set());const [filterOpen,setFilterOpen]=useState(false);useEffect(()=>{let active=true;getSalons().then(rows=>{if(active)setCatalogSalons(rows.map(mapDatabaseSalon))}).catch(error=>{if(active)setLoadError(error.message)}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[]);const clear=()=>{setQuery('');setLocation('All locations');setFilters({category:'All services',rating:0,price:0,home:false,open:false})};const results=useMemo(()=>{const q=query.trim().toLowerCase();let list=catalogSalons.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.services.some(x=>x.toLowerCase().includes(q)))&&(location==='All locations'||s.area===location)&&(filters.category==='All services'||s.category===filters.category||s.services.includes(filters.category))&&s.rating>=filters.rating&&(!filters.price||s.price<=filters.price)&&(!filters.home||s.home)&&(!filters.open||s.open));if(sort==='Highest Rated')list.sort((a,b)=>b.rating-a.rating);if(sort==='Nearest')list.sort((a,b)=>a.distance-b.distance);if(sort==='Price')list.sort((a,b)=>a.price-b.price);return list},[query,location,filters,sort,catalogSalons]);const toggleFavorite=id=>setFavorites(prev=>{const next=new Set(prev);next.has(id)?next.delete(id):next.add(id);return next});return <main className="min-h-screen bg-[#f7f2ec]"><header className="border-b border-wine-900/5 bg-white"><div className="wrap flex h-20 items-center justify-between"><a href="/" className="flex items-center gap-2.5 font-display text-2xl font-bold"><span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white"><Sparkles size={17}/></span>Aura</a><div className="flex items-center gap-2"><a href="/dashboard" className="hidden text-sm font-semibold text-stone-500 hover:text-wine-700 sm:block">My dashboard</a><a href="/" className="btn-secondary px-4 py-2.5"><ArrowLeft size={15}/>Home</a></div></div></header><section className="relative overflow-hidden bg-cream py-12 sm:py-16"><div className="absolute -right-24 -top-40 h-80 w-80 rounded-full bg-blush/60 blur-3xl"/><div className="wrap relative"><div className="eyebrow"><MapPin size={13}/>Curated beauty near you</div><h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">Discover Salons Near You</h1><p className="mt-4 max-w-2xl leading-7 text-stone-500">Compare trusted salons, transparent prices and real customer reviews—then book your perfect beauty moment.</p><div className="mt-8"><SalonSearchBar query={query} setQuery={setQuery} location={location} setLocation={setLocation}/></div></div></section><div className="wrap py-8 sm:py-12"><div className="mb-6 flex items-center justify-between"><p className="text-sm text-stone-500"><b className="text-ink">{loading?'…':results.length}</b> salons found</p><div className="flex items-center gap-2"><button onClick={()=>setFilterOpen(!filterOpen)} className="flex h-10 items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 text-sm font-bold lg:hidden"><Filter size={15}/>Filters</button><SortDropdown value={sort} onChange={setSort}/></div></div><div className="grid items-start gap-7 lg:grid-cols-[240px_1fr]"><aside className={`${filterOpen?'block':'hidden'} rounded-2xl bg-white p-5 shadow-sm lg:sticky lg:top-5 lg:block`}><div className="mb-4 flex justify-end lg:hidden"><button onClick={()=>setFilterOpen(false)} aria-label="Close filters"><X size={18}/></button></div><SalonFilters filters={filters} setFilters={setFilters} onClear={clear}/></aside><section>{loadError?<div className="rounded-2xl bg-red-50 p-5 text-sm font-semibold text-red-700">Unable to load salons: {loadError}</div>:loading?<div className="rounded-2xl bg-white p-10 text-center text-sm text-stone-500">Loading salons…</div>:results.length?<SalonGrid items={results} favorites={favorites} toggleFavorite={toggleFavorite}/>:<EmptyState onClear={clear}/>}</section></div></div></main>}
+export function SalonDiscoveryPage() {
+  const [catalogSalons, setCatalogSalons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("All locations");
+  const [filters, setFilters] = useState(() => ({
+    category:
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("category")) ||
+      "All services",
+    rating: 0,
+    price: 0,
+    home:
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("home") === "true",
+    open: false,
+  }));
+  const [sort, setSort] = useState("Recommended");
+  const [favorites, setFavorites] = useState(new Set());
+  const [filterOpen, setFilterOpen] = useState(false);
+  useEffect(() => {
+    let active = true;
+    getSalons()
+      .then((rows) => {
+        if (active) setCatalogSalons(rows.map(mapDatabaseSalon));
+      })
+      .catch((error) => {
+        if (active) setLoadError(error.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  const clear = () => {
+    setQuery("");
+    setLocation("All locations");
+    setFilters({
+      category: "All services",
+      rating: 0,
+      price: 0,
+      home: false,
+      open: false,
+    });
+  };
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = catalogSalons.filter(
+      (s) =>
+        (!q ||
+          s.name.toLowerCase().includes(q) ||
+          s.services.some((x) => x.toLowerCase().includes(q))) &&
+        (location === "All locations" || s.area === location) &&
+        (filters.category === "All services" ||
+          s.category === filters.category ||
+          s.services.includes(filters.category)) &&
+        s.rating >= filters.rating &&
+        (!filters.price || s.price <= filters.price) &&
+        (!filters.home || s.home) &&
+        (!filters.open || s.open),
+    );
+    if (sort === "Highest Rated") list.sort((a, b) => b.rating - a.rating);
+    if (sort === "Nearest") list.sort((a, b) => a.distance - b.distance);
+    if (sort === "Price") list.sort((a, b) => a.price - b.price);
+    return list;
+  }, [query, location, filters, sort, catalogSalons]);
+  const toggleFavorite = (id) =>
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  return (
+    <main className="min-h-screen bg-[#f7f2ec]">
+      <header className="border-b border-wine-900/5 bg-white">
+        <div className="wrap flex h-20 items-center justify-between">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 font-display text-2xl font-bold"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white">
+              <Sparkles size={17} />
+            </span>
+            Aura
+          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="/dashboard"
+              className="hidden text-sm font-semibold text-stone-500 hover:text-wine-700 sm:block"
+            >
+              My dashboard
+            </a>
+            <a href="/" className="btn-secondary px-4 py-2.5">
+              <ArrowLeft size={15} />
+              Home
+            </a>
+          </div>
+        </div>
+      </header>
+      <section className="relative overflow-hidden bg-cream py-12 sm:py-16">
+        <div className="absolute -right-24 -top-40 h-80 w-80 rounded-full bg-blush/60 blur-3xl" />
+        <div className="wrap relative">
+          <div className="eyebrow">
+            <MapPin size={13} />
+            Curated beauty near you
+          </div>
+          <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
+            Discover Salons Near You
+          </h1>
+          <p className="mt-4 max-w-2xl leading-7 text-stone-500">
+            Compare trusted salons, transparent prices and real customer
+            reviews—then book your perfect beauty moment.
+          </p>
+          <div className="mt-8">
+            <SalonSearchBar
+              query={query}
+              setQuery={setQuery}
+              location={location}
+              setLocation={setLocation}
+            />
+          </div>
+        </div>
+      </section>
+      <div className="wrap py-8 sm:py-12">
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-sm text-stone-500">
+            <b className="text-ink">{loading ? "…" : results.length}</b> salons
+            found
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFilterOpen(!filterOpen)}
+              className="flex h-10 items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 text-sm font-bold lg:hidden"
+            >
+              <Filter size={15} />
+              Filters
+            </button>
+            <SortDropdown value={sort} onChange={setSort} />
+          </div>
+        </div>
+        <div className="grid items-start gap-7 lg:grid-cols-[240px_1fr]">
+          <aside
+            className={`${filterOpen ? "block" : "hidden"} rounded-2xl bg-white p-5 shadow-sm lg:sticky lg:top-5 lg:block`}
+          >
+            <div className="mb-4 flex justify-end lg:hidden">
+              <button
+                onClick={() => setFilterOpen(false)}
+                aria-label="Close filters"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <SalonFilters
+              filters={filters}
+              setFilters={setFilters}
+              onClear={clear}
+            />
+          </aside>
+          <section>
+            {loadError ? (
+              <div className="rounded-2xl bg-red-50 p-5 text-sm font-semibold text-red-700">
+                Unable to load salons: {loadError}
+              </div>
+            ) : loading ? (
+              <div className="rounded-2xl bg-white p-10 text-center text-sm text-stone-500">
+                Loading salons…
+              </div>
+            ) : results.length ? (
+              <SalonGrid
+                items={results}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+              />
+            ) : (
+              <EmptyState onClear={clear} />
+            )}
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}
 
-function SalonDetailsSkeleton(){return <main className="min-h-screen animate-pulse bg-[#f7f2ec]"><div className="h-20 border-b border-stone-100 bg-white"/><div className="wrap py-8"><div className="h-[380px] rounded-3xl bg-stone-200"/><div className="mt-7 grid gap-6 lg:grid-cols-[1fr_320px]"><div className="h-96 rounded-2xl bg-white"/><div className="h-72 rounded-2xl bg-white"/></div></div></main>}
+function SalonDetailsSkeleton() {
+  return (
+    <main className="min-h-screen animate-pulse bg-[#f7f2ec]">
+      <div className="h-20 border-b border-stone-100 bg-white" />
+      <div className="wrap py-8">
+        <div className="h-[380px] rounded-3xl bg-stone-200" />
+        <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="h-96 rounded-2xl bg-white" />
+          <div className="h-72 rounded-2xl bg-white" />
+        </div>
+      </div>
+    </main>
+  );
+}
 
-function SalonDetailsError({message}){return <main className="grid min-h-screen place-items-center bg-[#f7f2ec] px-5"><div className="max-w-lg rounded-3xl bg-white p-8 text-center shadow-card"><div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-wine-50 text-wine-700"><Store size={24}/></div><h1 className="mt-5 font-display text-3xl font-bold">We couldn't open this salon.</h1><p className="mt-3 text-sm leading-6 text-stone-500">{message||'The salon may no longer be available.'}</p><a href="/salons" className="btn-primary mt-6"><ArrowLeft size={16}/>Back to discovery</a></div></main>}
+function SalonDetailsError({ message }) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#f7f2ec] px-5">
+      <div className="max-w-lg rounded-3xl bg-white p-8 text-center shadow-card">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-wine-50 text-wine-700">
+          <Store size={24} />
+        </div>
+        <h1 className="mt-5 font-display text-3xl font-bold">
+          We couldn't open this salon.
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-stone-500">
+          {message || "The salon may no longer be available."}
+        </p>
+        <a href="/salons" className="btn-primary mt-6">
+          <ArrowLeft size={16} />
+          Back to discovery
+        </a>
+      </div>
+    </main>
+  );
+}
 
-export function SalonDetailsPage({id}){const [salon,setSalon]=useState(null);const [loading,setLoading]=useState(true);const [error,setError]=useState('');useEffect(()=>{let active=true;setLoading(true);setError('');getSalonDetails(id).then(row=>{if(active)setSalon(row)}).catch(err=>{if(active)setError(err?.message||'Unable to load salon details.')}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[id]);if(loading)return <SalonDetailsSkeleton/>;if(error||!salon)return <SalonDetailsError message={error}/>;const services=(salon.services||[]).filter(x=>x.is_active!==false).sort((a,b)=>Number(a.price)-Number(b.price));const specialists=(salon.specialists||[]).filter(x=>x.is_active!==false);const reviews=[...(salon.reviews||[])].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));const average=reviews.length?reviews.reduce((sum,item)=>sum+Number(item.rating),0)/reviews.length:0;return <main className="min-h-screen bg-[#f7f2ec]"><header className="border-b border-wine-900/5 bg-white"><div className="wrap flex h-20 items-center justify-between"><a href="/" className="flex items-center gap-2.5 font-display text-2xl font-bold"><span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white"><Sparkles size={17}/></span>Aura</a><a href="/salons" className="btn-secondary px-4 py-2.5"><ArrowLeft size={15}/>Discover salons</a></div></header><div className="wrap py-8 sm:py-12"><section className="relative overflow-hidden rounded-3xl bg-wine-900 shadow-card"><img src={salon.image_url} alt={`${salon.name} interior`} className="h-[390px] w-full object-cover opacity-75 sm:h-[470px]"/><div className="absolute inset-0 bg-gradient-to-t from-wine-950 via-wine-950/25 to-transparent"/><div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10"><div className="flex flex-wrap gap-2">{salon.is_open&&<span className="rounded-full bg-emerald-500/90 px-3 py-1.5 text-xs font-bold">Open now</span>}{salon.offers_home_service&&<span className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold backdrop-blur"><House size={13}/>Home services</span>}</div><h1 className="mt-4 font-display text-4xl font-semibold tracking-[-.045em] sm:text-6xl">{salon.name}</h1><div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/80"><span className="flex items-center gap-1.5"><MapPin size={15}/>{salon.address}, {salon.city}</span><span className="flex items-center gap-1.5"><Star size={15} fill="currentColor" className="text-amber-300"/>{reviews.length?`${average.toFixed(1)} · ${reviews.length} review${reviews.length===1?'':'s'}`:'New on Aura'}</span><span>{'$'.repeat(salon.price_level||2)}</span></div></div></section><div className="mt-7 grid items-start gap-6 lg:grid-cols-[1fr_330px]"><div className="space-y-6"><section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8"><div className="eyebrow"><Sparkles size={13}/>About</div><h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">A little about {salon.name}</h2><p className="mt-4 leading-7 text-stone-500">{salon.description||`Discover professional beauty services in ${salon.city}, with transparent pricing and simple booking through Aura.`}</p></section><section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8"><div className="flex items-end justify-between gap-4"><div><div className="eyebrow"><CalendarCheck size={13}/>Services</div><h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">Choose your treatment</h2></div><span className="text-sm text-stone-400">{services.length} available</span></div>{services.length?<div className="mt-6 divide-y divide-stone-100">{services.map(service=><article key={service.id} className="flex flex-col gap-4 py-5 first:pt-0 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{service.name}</h3><span className="rounded-full bg-[#f7f2ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-wine-700">{service.category}</span></div><p className="mt-2 max-w-xl text-sm leading-6 text-stone-500">{service.description}</p><p className="mt-2 flex items-center gap-1.5 text-xs text-stone-400"><Clock3 size={13}/>{service.duration_minutes} minutes</p></div><div className="flex shrink-0 items-center justify-between gap-4 sm:block sm:text-right"><p className="font-display text-xl font-bold text-wine-700">${Number(service.price).toFixed(0)}</p><a href={`/booking/${salon.slug}`} className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-wine-700">Book <ArrowRight size={13}/></a></div></article>)}</div>:<p className="mt-6 rounded-xl bg-[#f7f2ec] p-5 text-sm text-stone-500">This salon is preparing its service menu. Check back soon.</p>}</section>{specialists.length>0&&<section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8"><div className="eyebrow"><UsersRound size={13}/>Team</div><h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">Meet the specialists</h2><div className="mt-6 grid gap-4 sm:grid-cols-2">{specialists.map((person,index)=><article key={person.id} className="flex items-center gap-4 rounded-2xl border border-stone-100 p-4"><div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-wine-50">{person.image_url?<img src={person.image_url} alt="" className="h-full w-full object-cover"/>:<div className="grid h-full place-items-center text-wine-700"><UserRound size={24}/></div>}</div><div><p className="font-bold">Specialist {index+1}</p><p className="mt-1 text-sm text-stone-500">{person.specialty}</p><p className="mt-1 text-xs font-semibold text-wine-700">{person.rating?`${Number(person.rating).toFixed(1)} ★ · `:''}{person.experience_years} years experience</p></div></article>)}</div></section>}{reviews.length>0&&<section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8"><div className="eyebrow"><Star size={13}/>Verified reviews</div><h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">What customers say</h2><div className="mt-6 grid gap-4 sm:grid-cols-2">{reviews.slice(0,4).map(review=><blockquote key={review.id} className="rounded-2xl bg-[#f7f2ec] p-5"><div className="flex text-amber-500">{Array.from({length:review.rating},(_,i)=><Star key={i} size={14} fill="currentColor"/>)}</div><p className="mt-3 text-sm leading-6 text-stone-600">{review.comment||'A verified Aura customer enjoyed this appointment.'}</p><footer className="mt-4 text-xs font-semibold text-stone-400">Verified booking · {new Date(review.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</footer></blockquote>)}</div></section>}</div><aside className="sticky top-5 rounded-2xl bg-white p-6 shadow-card"><div className="grid h-12 w-12 place-items-center rounded-xl bg-wine-50 text-wine-700"><CalendarCheck size={22}/></div><h2 className="mt-5 font-display text-2xl font-bold">Ready for your next beauty moment?</h2><p className="mt-3 text-sm leading-6 text-stone-500">Select a service, specialist, and time that works for you.</p><a href={`/booking/${salon.slug}`} className={`btn-primary mt-6 w-full ${services.length?'':'pointer-events-none opacity-50'}`}>Book this salon<ArrowRight size={16}/></a><div className="mt-5 space-y-3 border-t border-stone-100 pt-5 text-xs text-stone-500"><p className="flex items-center gap-2"><ShieldCheck size={15} className="text-wine-700"/>Secure booking through Aura</p><p className="flex items-center gap-2"><MapPin size={15} className="text-wine-700"/>{salon.address}, {salon.city}</p>{salon.offers_home_service&&<p className="flex items-center gap-2"><House size={15} className="text-wine-700"/>At-home appointments available</p>}</div></aside></div></div></main>}
-const bookingServices=[
-  {id:'haircut',name:'Haircut & Styling',description:'A tailored cut, wash and professional finish.',duration:60,price:25},
-  {id:'color',name:'Hair Coloring',description:'Personalized color consultation and full application.',duration:120,price:60},
-  {id:'manicure',name:'Manicure',description:'Nail shaping, detailed cuticle care and polish.',duration:45,price:20},
-  {id:'pedicure',name:'Pedicure',description:'Restorative foot care, shaping and premium polish.',duration:55,price:25},
-  {id:'facial',name:'Facial Treatment',description:'Skin analysis and a customized radiance facial.',duration:75,price:45},
-  {id:'makeup',name:'Makeup',description:'A polished look tailored to your occasion and style.',duration:60,price:40},
-]
-const specialists=[
-  {id:'maya',name:'Maya Khalil',specialty:'Hair stylist & colorist',rating:4.9,experience:8,image:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=85'},
-  {id:'layla',name:'Layla Nasser',specialty:'Skin & beauty specialist',rating:4.8,experience:6,image:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=300&q=85'},
-  {id:'noura',name:'Noura Saleh',specialty:'Nail artist & makeup expert',rating:4.9,experience:5,image:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=85'},
-]
-const bookingSteps=['Service','Specialist','Date & Time','Location','Payment','Confirm']
-const times=[{label:'09:00 AM'},{label:'10:30 AM',disabled:true},{label:'12:00 PM'},{label:'01:30 PM'},{label:'03:00 PM'},{label:'04:30 PM',disabled:true},{label:'06:00 PM'}]
-const money=n=>`$${n.toFixed(2)}`
+export function SalonDetailsPage({ id }) {
+  const [salon, setSalon] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+    getSalonDetails(id)
+      .then((row) => {
+        if (active) setSalon(row);
+      })
+      .catch((err) => {
+        if (active) setError(err?.message || "Unable to load salon details.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+  if (loading) return <SalonDetailsSkeleton />;
+  if (error || !salon) return <SalonDetailsError message={error} />;
+  const services = (salon.services || [])
+    .filter((x) => x.is_active !== false)
+    .sort((a, b) => Number(a.price) - Number(b.price));
+  const specialists = (salon.specialists || []).filter(
+    (x) => x.is_active !== false,
+  );
+  const reviews = [...(salon.reviews || [])].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at),
+  );
+  const average = reviews.length
+    ? reviews.reduce((sum, item) => sum + Number(item.rating), 0) /
+      reviews.length
+    : 0;
+  return (
+    <main className="min-h-screen bg-[#f7f2ec]">
+      <header className="border-b border-wine-900/5 bg-white">
+        <div className="wrap flex h-20 items-center justify-between">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 font-display text-2xl font-bold"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white">
+              <Sparkles size={17} />
+            </span>
+            Aura
+          </a>
+          <a href="/salons" className="btn-secondary px-4 py-2.5">
+            <ArrowLeft size={15} />
+            Discover salons
+          </a>
+        </div>
+      </header>
+      <div className="wrap py-8 sm:py-12">
+        <section className="relative overflow-hidden rounded-3xl bg-wine-900 shadow-card">
+          <img
+            src={salon.image_url}
+            alt={`${salon.name} interior`}
+            className="h-[390px] w-full object-cover opacity-75 sm:h-[470px]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-wine-950 via-wine-950/25 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
+            <div className="flex flex-wrap gap-2">
+              {salon.is_open && (
+                <span className="rounded-full bg-emerald-500/90 px-3 py-1.5 text-xs font-bold">
+                  Open now
+                </span>
+              )}
+              {salon.offers_home_service && (
+                <span className="flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold backdrop-blur">
+                  <House size={13} />
+                  Home services
+                </span>
+              )}
+            </div>
+            <h1 className="mt-4 font-display text-4xl font-semibold tracking-[-.045em] sm:text-6xl">
+              {salon.name}
+            </h1>
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/80">
+              <span className="flex items-center gap-1.5">
+                <MapPin size={15} />
+                {salon.address}, {salon.city}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Star
+                  size={15}
+                  fill="currentColor"
+                  className="text-amber-300"
+                />
+                {reviews.length
+                  ? `${average.toFixed(1)} · ${reviews.length} review${reviews.length === 1 ? "" : "s"}`
+                  : "New on Aura"}
+              </span>
+              <span>{"$".repeat(salon.price_level || 2)}</span>
+            </div>
+          </div>
+        </section>
+        <div className="mt-7 grid items-start gap-6 lg:grid-cols-[1fr_330px]">
+          <div className="space-y-6">
+            <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+              <div className="eyebrow">
+                <Sparkles size={13} />
+                About
+              </div>
+              <h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">
+                A little about {salon.name}
+              </h2>
+              <p className="mt-4 leading-7 text-stone-500">
+                {salon.description ||
+                  `Discover professional beauty services in ${salon.city}, with transparent pricing and simple booking through Aura.`}
+              </p>
+            </section>
+            <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <div className="eyebrow">
+                    <CalendarCheck size={13} />
+                    Services
+                  </div>
+                  <h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">
+                    Choose your treatment
+                  </h2>
+                </div>
+                <span className="text-sm text-stone-400">
+                  {services.length} available
+                </span>
+              </div>
+              {services.length ? (
+                <div className="mt-6 divide-y divide-stone-100">
+                  {services.map((service) => (
+                    <article
+                      key={service.id}
+                      className="flex flex-col gap-4 py-5 first:pt-0 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-bold">{service.name}</h3>
+                          <span className="rounded-full bg-[#f7f2ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-wine-700">
+                            {service.category}
+                          </span>
+                        </div>
+                        <p className="mt-2 max-w-xl text-sm leading-6 text-stone-500">
+                          {service.description}
+                        </p>
+                        <p className="mt-2 flex items-center gap-1.5 text-xs text-stone-400">
+                          <Clock3 size={13} />
+                          {service.duration_minutes} minutes
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center justify-between gap-4 sm:block sm:text-right">
+                        <p className="font-display text-xl font-bold text-wine-700">
+                          ${Number(service.price).toFixed(0)}
+                        </p>
+                        <a
+                          href={`/booking/${salon.slug}`}
+                          className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-wine-700"
+                        >
+                          Book <ArrowRight size={13} />
+                        </a>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-6 rounded-xl bg-[#f7f2ec] p-5 text-sm text-stone-500">
+                  This salon is preparing its service menu. Check back soon.
+                </p>
+              )}
+            </section>
+            {specialists.length > 0 && (
+              <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+                <div className="eyebrow">
+                  <UsersRound size={13} />
+                  Team
+                </div>
+                <h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">
+                  Meet the specialists
+                </h2>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {specialists.map((person, index) => (
+                    <article
+                      key={person.id}
+                      className="flex items-center gap-4 rounded-2xl border border-stone-100 p-4"
+                    >
+                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-wine-50">
+                        {person.image_url ? (
+                          <img
+                            src={person.image_url}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="grid h-full place-items-center text-wine-700">
+                            <UserRound size={24} />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-bold">Specialist {index + 1}</p>
+                        <p className="mt-1 text-sm text-stone-500">
+                          {person.specialty}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-wine-700">
+                          {person.rating
+                            ? `${Number(person.rating).toFixed(1)} ★ · `
+                            : ""}
+                          {person.experience_years} years experience
+                        </p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+            {reviews.length > 0 && (
+              <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
+                <div className="eyebrow">
+                  <Star size={13} />
+                  Verified reviews
+                </div>
+                <h2 className="mt-5 font-display text-3xl font-bold tracking-[-.035em]">
+                  What customers say
+                </h2>
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {reviews.slice(0, 4).map((review) => (
+                    <blockquote
+                      key={review.id}
+                      className="rounded-2xl bg-[#f7f2ec] p-5"
+                    >
+                      <div className="flex text-amber-500">
+                        {Array.from({ length: review.rating }, (_, i) => (
+                          <Star key={i} size={14} fill="currentColor" />
+                        ))}
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-stone-600">
+                        {review.comment ||
+                          "A verified Aura customer enjoyed this appointment."}
+                      </p>
+                      <footer className="mt-4 text-xs font-semibold text-stone-400">
+                        Verified booking ·{" "}
+                        {new Date(review.created_at).toLocaleDateString(
+                          "en-US",
+                          { month: "short", year: "numeric" },
+                        )}
+                      </footer>
+                    </blockquote>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+          <aside className="sticky top-5 rounded-2xl bg-white p-6 shadow-card">
+            <div className="grid h-12 w-12 place-items-center rounded-xl bg-wine-50 text-wine-700">
+              <CalendarCheck size={22} />
+            </div>
+            <h2 className="mt-5 font-display text-2xl font-bold">
+              Ready for your next beauty moment?
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-stone-500">
+              Select a service, specialist, and time that works for you.
+            </p>
+            <a
+              href={`/booking/${salon.slug}`}
+              className={`btn-primary mt-6 w-full ${services.length ? "" : "pointer-events-none opacity-50"}`}
+            >
+              Book this salon
+              <ArrowRight size={16} />
+            </a>
+            <div className="mt-5 space-y-3 border-t border-stone-100 pt-5 text-xs text-stone-500">
+              <p className="flex items-center gap-2">
+                <ShieldCheck size={15} className="text-wine-700" />
+                Secure booking through Aura
+              </p>
+              <p className="flex items-center gap-2">
+                <MapPin size={15} className="text-wine-700" />
+                {salon.address}, {salon.city}
+              </p>
+              {salon.offers_home_service && (
+                <p className="flex items-center gap-2">
+                  <House size={15} className="text-wine-700" />
+                  At-home appointments available
+                </p>
+              )}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  );
+}
+const bookingServices = [
+  {
+    id: "haircut",
+    name: "Haircut & Styling",
+    description: "A tailored cut, wash and professional finish.",
+    duration: 60,
+    price: 25,
+  },
+  {
+    id: "color",
+    name: "Hair Coloring",
+    description: "Personalized color consultation and full application.",
+    duration: 120,
+    price: 60,
+  },
+  {
+    id: "manicure",
+    name: "Manicure",
+    description: "Nail shaping, detailed cuticle care and polish.",
+    duration: 45,
+    price: 20,
+  },
+  {
+    id: "pedicure",
+    name: "Pedicure",
+    description: "Restorative foot care, shaping and premium polish.",
+    duration: 55,
+    price: 25,
+  },
+  {
+    id: "facial",
+    name: "Facial Treatment",
+    description: "Skin analysis and a customized radiance facial.",
+    duration: 75,
+    price: 45,
+  },
+  {
+    id: "makeup",
+    name: "Makeup",
+    description: "A polished look tailored to your occasion and style.",
+    duration: 60,
+    price: 40,
+  },
+];
+const specialists = [
+  {
+    id: "maya",
+    name: "Maya Khalil",
+    specialty: "Hair stylist & colorist",
+    rating: 4.9,
+    experience: 8,
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=85",
+  },
+  {
+    id: "layla",
+    name: "Layla Nasser",
+    specialty: "Skin & beauty specialist",
+    rating: 4.8,
+    experience: 6,
+    image:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=300&q=85",
+  },
+  {
+    id: "noura",
+    name: "Noura Saleh",
+    specialty: "Nail artist & makeup expert",
+    rating: 4.9,
+    experience: 5,
+    image:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=85",
+  },
+];
+const bookingSteps = [
+  "Service",
+  "Specialist",
+  "Date & Time",
+  "Location",
+  "Payment",
+  "Confirm",
+];
+const times = [
+  { label: "09:00 AM" },
+  { label: "10:30 AM", disabled: true },
+  { label: "12:00 PM" },
+  { label: "01:30 PM" },
+  { label: "03:00 PM" },
+  { label: "04:30 PM", disabled: true },
+  { label: "06:00 PM" },
+];
+const money = (n) => `$${n.toFixed(2)}`;
 
-export function BookingSteps({current}){return <div className="overflow-x-auto pb-2"><div className="flex min-w-[660px] items-center">{bookingSteps.map((label,i)=><React.Fragment key={label}><div className={`flex items-center gap-2 ${i<=current?'text-wine-700':'text-stone-300'}`}><span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i<current?'bg-wine-700 text-white':i===current?'border-2 border-wine-700 bg-wine-50':'border border-stone-200 bg-white'}`}>{i<current?<Check size={13}/>:i+1}</span><span className="whitespace-nowrap text-xs font-bold">{label}</span></div>{i<bookingSteps.length-1&&<span className={`mx-3 h-px min-w-5 flex-1 ${i<current?'bg-wine-400':'bg-stone-200'}`}/>}</React.Fragment>)}</div></div>}
-function StepHeader({number,title,copy}){return <div className="mb-6 flex items-start gap-4"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-wine-700 text-sm font-bold text-white">{number}</span><div><h2 className="font-display text-2xl font-bold tracking-[-.03em]">{title}</h2><p className="mt-1 text-sm text-stone-500">{copy}</p></div></div>}
-export function ServiceSelector({value,onChange}){return <div className="grid gap-3 sm:grid-cols-2">{bookingServices.map(s=><button key={s.id} onClick={()=>onChange(s)} className={`relative rounded-xl border p-4 text-left transition hover:-translate-y-0.5 ${value?.id===s.id?'border-wine-700 bg-wine-50 shadow-sm':'border-stone-200 bg-white hover:border-wine-300'}`}><div className="flex justify-between gap-3"><h3 className="font-bold">{s.name}</h3><span className="font-display font-bold text-wine-700">${s.price}</span></div><p className="mt-2 text-xs leading-5 text-stone-500">{s.description}</p><p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-stone-400"><Clock3 size={13}/>{s.duration} min</p>{value?.id===s.id&&<CheckCircle2 size={18} className="absolute -right-2 -top-2 fill-white text-wine-700"/>}</button>)}</div>}
-export function SpecialistSelector({value,onChange}){return <div className="grid gap-3 sm:grid-cols-2"><button onClick={()=>onChange({id:'any',name:'No Preference'})} className={`flex min-h-28 items-center gap-4 rounded-xl border p-4 text-left transition ${value?.id==='any'?'border-wine-700 bg-wine-50':'border-stone-200 bg-white hover:border-wine-300'}`}><span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-wine-100 text-wine-700"><UserRound/></span><span><b className="block">No Preference</b><span className="mt-1 block text-xs leading-5 text-stone-500">Match me with the best available specialist.</span></span></button>{specialists.map(s=><article key={s.id} className={`rounded-xl border p-4 transition ${value?.id===s.id?'border-wine-700 bg-wine-50':'border-stone-200 bg-white'}`}><div className="flex items-center gap-3"><img src={s.image} alt={s.name} className="h-14 w-14 rounded-full object-cover"/><div className="min-w-0"><h3 className="font-bold">{s.name}</h3><p className="truncate text-xs text-stone-500">{s.specialty}</p><p className="mt-1 flex items-center gap-1 text-xs font-bold text-[#9a6b16]"><Star size={12} fill="currentColor"/>{s.rating}<span className="font-normal text-stone-400">· {s.experience} years</span></p></div></div><button onClick={()=>onChange(s)} className={`mt-3 w-full rounded-lg py-2 text-xs font-bold ${value?.id===s.id?'bg-wine-700 text-white':'border border-wine-200 text-wine-700 hover:bg-wine-50'}`}>{value?.id===s.id?'Selected':'Select'}</button></article>)}</div>}
-export function DateSelector({value,onChange}){const dates=useMemo(()=>Array.from({length:7},(_,i)=>{const date=new Date();date.setDate(date.getDate()+i+1);return{key:date.toISOString().slice(0,10),date,day:date.toLocaleDateString('en-US',{weekday:'short'}),number:date.getDate(),month:date.toLocaleDateString('en-US',{month:'short'})}}),[]);return <div className="flex gap-2 overflow-x-auto pb-2">{dates.map(d=><button key={d.key} onClick={()=>onChange(d)} className={`min-w-[74px] rounded-xl border px-3 py-3 text-center transition ${value?.key===d.key?'border-wine-700 bg-wine-700 text-white shadow-lg shadow-wine-700/15':'border-stone-200 bg-white hover:border-wine-300'}`}><span className={`block text-[10px] font-bold uppercase tracking-wider ${value?.key===d.key?'text-white/65':'text-stone-400'}`}>{d.day}</span><span className="mt-1 block font-display text-xl font-bold">{d.number}</span><span className={`block text-[10px] ${value?.key===d.key?'text-white/65':'text-stone-400'}`}>{d.month}</span></button>)}</div>}
-export function TimeSelector({value,onChange}){return <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{times.map(t=><button key={t.label} disabled={t.disabled} onClick={()=>onChange(t.label)} className={`rounded-lg border px-2 py-3 text-xs font-bold transition ${t.disabled?'cursor-not-allowed border-stone-100 bg-stone-100 text-stone-300 line-through':value===t.label?'border-wine-700 bg-wine-50 text-wine-700':'border-stone-200 bg-white hover:border-wine-300'}`}>{t.label}</button>)}</div>}
-export function LocationSelector({value,onChange,address,setAddress}){return <div><div className="grid gap-3 sm:grid-cols-2">{[{id:'salon',title:'At Salon',copy:'Visit the salon at its listed address.',icon:Store},{id:'home',title:'Home Service',copy:'A specialist comes to your location.',icon:House}].map(o=><button key={o.id} onClick={()=>onChange(o.id)} className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${value===o.id?'border-wine-700 bg-wine-50':'border-stone-200 bg-white hover:border-wine-300'}`}><span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${value===o.id?'bg-wine-700 text-white':'bg-stone-100 text-stone-500'}`}><o.icon size={19}/></span><span><b className="block">{o.title}</b><span className="mt-1 block text-xs leading-5 text-stone-500">{o.copy}</span>{o.id==='home'&&<span className="mt-2 block text-xs font-bold text-wine-700">+$12.00 service fee</span>}</span></button>)}</div>{value==='home'&&<motion.div initial={{opacity:0,y:-6}} animate={{opacity:1,y:0}} className="mt-4 grid gap-3 rounded-xl bg-[#f7f2ec] p-4 sm:grid-cols-2"><label className="sm:col-span-2"><span className="mb-1.5 block text-xs font-bold">Address</span><input className={inputClass} value={address.address} onChange={e=>setAddress({...address,address:e.target.value})} placeholder="Street and building number"/></label><label><span className="mb-1.5 block text-xs font-bold">City</span><input className={inputClass} value={address.city} onChange={e=>setAddress({...address,city:e.target.value})} placeholder="Your city"/></label><label><span className="mb-1.5 block text-xs font-bold">Location notes</span><input className={inputClass} value={address.notes} onChange={e=>setAddress({...address,notes:e.target.value})} placeholder="Floor, landmark, etc."/></label></motion.div>}</div>}
-export function PaymentSelector({value,onChange,home}){const options=[{id:'online',title:'Pay Online',copy:'Secure card payment at confirmation.',icon:CreditCard},{id:'salon',title:'Cash at Salon',copy:'Pay when you arrive for your appointment.',icon:Banknote},...(home?[{id:'delivery',title:'Cash on Home Service',copy:'Pay your specialist after the service.',icon:WalletCards}]:[])];return <div className="grid gap-3">{options.map(o=><button key={o.id} onClick={()=>onChange(o.id)} className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${value===o.id?'border-wine-700 bg-wine-50':'border-stone-200 bg-white hover:border-wine-300'}`}><span className={`grid h-10 w-10 place-items-center rounded-lg ${value===o.id?'bg-wine-700 text-white':'bg-stone-100 text-stone-500'}`}><o.icon size={19}/></span><span className="flex-1"><b className="block">{o.title}</b><span className="mt-1 block text-xs text-stone-500">{o.copy}</span></span><span className={`grid h-5 w-5 place-items-center rounded-full border ${value===o.id?'border-wine-700 bg-wine-700 text-white':'border-stone-300'}`}>{value===o.id&&<Check size={12}/>}</span></button>)}</div>}
-export function BookingSummary({salon,booking,onConfirm,ready}){const fee=booking.location==='home'?12:0;const total=(booking.service?.price||0)+fee;return <aside className="rounded-2xl bg-white p-5 shadow-card lg:sticky lg:top-6"><div className="flex items-center gap-3 border-b border-stone-100 pb-5"><img src={salon.image} alt="" className="h-14 w-14 rounded-xl object-cover"/><div><p className="text-[10px] font-bold uppercase tracking-wider text-wine-600">Booking summary</p><h2 className="mt-1 font-bold">{salon.name}</h2><p className="mt-1 flex items-center gap-1 text-xs text-stone-400"><MapPin size={11}/>{salon.location}</p></div></div><dl className="space-y-3 py-5 text-sm">{[['Service',booking.service?.name],['Specialist',booking.specialist?.name],['Date',booking.date?.date.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})],['Time',booking.time],['Location',booking.location==='home'?'Home Service':booking.location==='salon'?'At Salon':null]].map(([k,v])=><div key={k} className="flex justify-between gap-4"><dt className="text-stone-400">{k}</dt><dd className={`text-right font-semibold ${v?'text-ink':'text-stone-300'}`}>{v||'Not selected'}</dd></div>)}</dl><div className="space-y-2 border-t border-stone-100 pt-4 text-sm"><div className="flex justify-between"><span className="text-stone-500">Service price</span><b>{booking.service?money(booking.service.price):'$0.00'}</b></div>{fee>0&&<div className="flex justify-between"><span className="text-stone-500">Home service fee</span><b>{money(fee)}</b></div>}<div className="flex justify-between pt-2 font-display text-xl font-bold"><span>Total</span><span className="text-wine-700">{money(total)}</span></div></div><button onClick={onConfirm} disabled={!ready} className="btn-primary mt-6 w-full rounded-xl disabled:cursor-not-allowed disabled:bg-stone-300 disabled:shadow-none"><CalendarCheck size={17}/>Confirm Booking</button>{!ready&&<p className="mt-3 text-center text-[11px] leading-4 text-stone-400">Complete all required steps to confirm.</p>}<p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-stone-400"><ShieldCheck size={12}/>Your appointment details are protected</p></aside>}
-export function BookingSuccessModal({salon,booking,onClose}){return <div className="fixed inset-0 z-50 grid place-items-center bg-wine-900/60 p-4 backdrop-blur-sm"><motion.div initial={{opacity:0,scale:.94,y:16}} animate={{opacity:1,scale:1,y:0}} role="dialog" aria-modal="true" aria-labelledby="success-title" className="relative w-full max-w-md rounded-3xl bg-white p-7 text-center shadow-2xl"><button onClick={onClose} aria-label="Close" className="absolute right-5 top-5 text-stone-400"><X size={18}/></button><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={30}/></div><p className="mt-5 text-xs font-bold uppercase tracking-[.15em] text-wine-600">Booking #{booking.saved?.booking_number||'AU-28491'}</p><h2 id="success-title" className="mt-2 font-display text-3xl font-bold tracking-[-.04em]">Your appointment is confirmed!</h2><div className="mt-6 rounded-xl bg-[#f7f2ec] p-4 text-left text-sm"><p className="font-bold">{salon.name}</p><p className="mt-2 text-stone-500">{booking.service.name} · {booking.specialist.name}</p><p className="mt-1 text-stone-500">{booking.date.date.toLocaleDateString('en-US',{month:'long',day:'numeric'})} at {booking.time}</p></div><div className="mt-6 grid gap-2 sm:grid-cols-2"><a href="/my-bookings" className="btn-primary rounded-xl px-4">View My Bookings</a><a href="/salons" className="btn-secondary rounded-xl px-4">Discover Salons</a></div></motion.div></div>}
+export function BookingSteps({ current }) {
+  return (
+    <div className="overflow-x-auto pb-2">
+      <div className="flex min-w-[660px] items-center">
+        {bookingSteps.map((label, i) => (
+          <React.Fragment key={label}>
+            <div
+              className={`flex items-center gap-2 ${i <= current ? "text-wine-700" : "text-stone-300"}`}
+            >
+              <span
+                className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i < current ? "bg-wine-700 text-white" : i === current ? "border-2 border-wine-700 bg-wine-50" : "border border-stone-200 bg-white"}`}
+              >
+                {i < current ? <Check size={13} /> : i + 1}
+              </span>
+              <span className="whitespace-nowrap text-xs font-bold">
+                {label}
+              </span>
+            </div>
+            {i < bookingSteps.length - 1 && (
+              <span
+                className={`mx-3 h-px min-w-5 flex-1 ${i < current ? "bg-wine-400" : "bg-stone-200"}`}
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+function StepHeader({ number, title, copy }) {
+  return (
+    <div className="mb-6 flex items-start gap-4">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-wine-700 text-sm font-bold text-white">
+        {number}
+      </span>
+      <div>
+        <h2 className="font-display text-2xl font-bold tracking-[-.03em]">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-stone-500">{copy}</p>
+      </div>
+    </div>
+  );
+}
+export function ServiceSelector({ value, onChange }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {bookingServices.map((s) => (
+        <button
+          key={s.id}
+          onClick={() => onChange(s)}
+          className={`relative rounded-xl border p-4 text-left transition hover:-translate-y-0.5 ${value?.id === s.id ? "border-wine-700 bg-wine-50 shadow-sm" : "border-stone-200 bg-white hover:border-wine-300"}`}
+        >
+          <div className="flex justify-between gap-3">
+            <h3 className="font-bold">{s.name}</h3>
+            <span className="font-display font-bold text-wine-700">
+              ${s.price}
+            </span>
+          </div>
+          <p className="mt-2 text-xs leading-5 text-stone-500">
+            {s.description}
+          </p>
+          <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-stone-400">
+            <Clock3 size={13} />
+            {s.duration} min
+          </p>
+          {value?.id === s.id && (
+            <CheckCircle2
+              size={18}
+              className="absolute -right-2 -top-2 fill-white text-wine-700"
+            />
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+export function SpecialistSelector({ value, onChange }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <button
+        onClick={() => onChange({ id: "any", name: "No Preference" })}
+        className={`flex min-h-28 items-center gap-4 rounded-xl border p-4 text-left transition ${value?.id === "any" ? "border-wine-700 bg-wine-50" : "border-stone-200 bg-white hover:border-wine-300"}`}
+      >
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-wine-100 text-wine-700">
+          <UserRound />
+        </span>
+        <span>
+          <b className="block">No Preference</b>
+          <span className="mt-1 block text-xs leading-5 text-stone-500">
+            Match me with the best available specialist.
+          </span>
+        </span>
+      </button>
+      {specialists.map((s) => (
+        <article
+          key={s.id}
+          className={`rounded-xl border p-4 transition ${value?.id === s.id ? "border-wine-700 bg-wine-50" : "border-stone-200 bg-white"}`}
+        >
+          <div className="flex items-center gap-3">
+            <img
+              src={s.image}
+              alt={s.name}
+              className="h-14 w-14 rounded-full object-cover"
+            />
+            <div className="min-w-0">
+              <h3 className="font-bold">{s.name}</h3>
+              <p className="truncate text-xs text-stone-500">{s.specialty}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs font-bold text-[#9a6b16]">
+                <Star size={12} fill="currentColor" />
+                {s.rating}
+                <span className="font-normal text-stone-400">
+                  · {s.experience} years
+                </span>
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onChange(s)}
+            className={`mt-3 w-full rounded-lg py-2 text-xs font-bold ${value?.id === s.id ? "bg-wine-700 text-white" : "border border-wine-200 text-wine-700 hover:bg-wine-50"}`}
+          >
+            {value?.id === s.id ? "Selected" : "Select"}
+          </button>
+        </article>
+      ))}
+    </div>
+  );
+}
+export function DateSelector({ value, onChange }) {
+  const dates = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() + i + 1);
+        return {
+          key: date.toISOString().slice(0, 10),
+          date,
+          day: date.toLocaleDateString("en-US", { weekday: "short" }),
+          number: date.getDate(),
+          month: date.toLocaleDateString("en-US", { month: "short" }),
+        };
+      }),
+    [],
+  );
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-2">
+      {dates.map((d) => (
+        <button
+          key={d.key}
+          onClick={() => onChange(d)}
+          className={`min-w-[74px] rounded-xl border px-3 py-3 text-center transition ${value?.key === d.key ? "border-wine-700 bg-wine-700 text-white shadow-lg shadow-wine-700/15" : "border-stone-200 bg-white hover:border-wine-300"}`}
+        >
+          <span
+            className={`block text-[10px] font-bold uppercase tracking-wider ${value?.key === d.key ? "text-white/65" : "text-stone-400"}`}
+          >
+            {d.day}
+          </span>
+          <span className="mt-1 block font-display text-xl font-bold">
+            {d.number}
+          </span>
+          <span
+            className={`block text-[10px] ${value?.key === d.key ? "text-white/65" : "text-stone-400"}`}
+          >
+            {d.month}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+export function TimeSelector({ value, onChange }) {
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {times.map((t) => (
+        <button
+          key={t.label}
+          disabled={t.disabled}
+          onClick={() => onChange(t.label)}
+          className={`rounded-lg border px-2 py-3 text-xs font-bold transition ${t.disabled ? "cursor-not-allowed border-stone-100 bg-stone-100 text-stone-300 line-through" : value === t.label ? "border-wine-700 bg-wine-50 text-wine-700" : "border-stone-200 bg-white hover:border-wine-300"}`}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+export function LocationSelector({ value, onChange, address, setAddress }) {
+  return (
+    <div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {[
+          {
+            id: "salon",
+            title: "At Salon",
+            copy: "Visit the salon at its listed address.",
+            icon: Store,
+          },
+          {
+            id: "home",
+            title: "Home Service",
+            copy: "A specialist comes to your location.",
+            icon: House,
+          },
+        ].map((o) => (
+          <button
+            key={o.id}
+            onClick={() => onChange(o.id)}
+            className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${value === o.id ? "border-wine-700 bg-wine-50" : "border-stone-200 bg-white hover:border-wine-300"}`}
+          >
+            <span
+              className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${value === o.id ? "bg-wine-700 text-white" : "bg-stone-100 text-stone-500"}`}
+            >
+              <o.icon size={19} />
+            </span>
+            <span>
+              <b className="block">{o.title}</b>
+              <span className="mt-1 block text-xs leading-5 text-stone-500">
+                {o.copy}
+              </span>
+              {o.id === "home" && (
+                <span className="mt-2 block text-xs font-bold text-wine-700">
+                  +$12.00 service fee
+                </span>
+              )}
+            </span>
+          </button>
+        ))}
+      </div>
+      {value === "home" && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 grid gap-3 rounded-xl bg-[#f7f2ec] p-4 sm:grid-cols-2"
+        >
+          <label className="sm:col-span-2">
+            <span className="mb-1.5 block text-xs font-bold">Address</span>
+            <input
+              className={inputClass}
+              value={address.address}
+              onChange={(e) =>
+                setAddress({ ...address, address: e.target.value })
+              }
+              placeholder="Street and building number"
+            />
+          </label>
+          <label>
+            <span className="mb-1.5 block text-xs font-bold">City</span>
+            <input
+              className={inputClass}
+              value={address.city}
+              onChange={(e) => setAddress({ ...address, city: e.target.value })}
+              placeholder="Your city"
+            />
+          </label>
+          <label>
+            <span className="mb-1.5 block text-xs font-bold">
+              Location notes
+            </span>
+            <input
+              className={inputClass}
+              value={address.notes}
+              onChange={(e) =>
+                setAddress({ ...address, notes: e.target.value })
+              }
+              placeholder="Floor, landmark, etc."
+            />
+          </label>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+export function PaymentSelector({ value, onChange, home }) {
+  const options = [
+    {
+      id: "online",
+      title: "Pay Online",
+      copy: "Secure card payment at confirmation.",
+      icon: CreditCard,
+    },
+    {
+      id: "salon",
+      title: "Cash at Salon",
+      copy: "Pay when you arrive for your appointment.",
+      icon: Banknote,
+    },
+    ...(home
+      ? [
+          {
+            id: "delivery",
+            title: "Cash on Home Service",
+            copy: "Pay your specialist after the service.",
+            icon: WalletCards,
+          },
+        ]
+      : []),
+  ];
+  return (
+    <div className="grid gap-3">
+      {options.map((o) => (
+        <button
+          key={o.id}
+          onClick={() => onChange(o.id)}
+          className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${value === o.id ? "border-wine-700 bg-wine-50" : "border-stone-200 bg-white hover:border-wine-300"}`}
+        >
+          <span
+            className={`grid h-10 w-10 place-items-center rounded-lg ${value === o.id ? "bg-wine-700 text-white" : "bg-stone-100 text-stone-500"}`}
+          >
+            <o.icon size={19} />
+          </span>
+          <span className="flex-1">
+            <b className="block">{o.title}</b>
+            <span className="mt-1 block text-xs text-stone-500">{o.copy}</span>
+          </span>
+          <span
+            className={`grid h-5 w-5 place-items-center rounded-full border ${value === o.id ? "border-wine-700 bg-wine-700 text-white" : "border-stone-300"}`}
+          >
+            {value === o.id && <Check size={12} />}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+export function BookingSummary({ salon, booking, onConfirm, ready }) {
+  const fee = booking.location === "home" ? 12 : 0;
+  const total = (booking.service?.price || 0) + fee;
+  return (
+    <aside className="rounded-2xl bg-white p-5 shadow-card lg:sticky lg:top-6">
+      <div className="flex items-center gap-3 border-b border-stone-100 pb-5">
+        <img
+          src={salon.image}
+          alt=""
+          className="h-14 w-14 rounded-xl object-cover"
+        />
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-wine-600">
+            Booking summary
+          </p>
+          <h2 className="mt-1 font-bold">{salon.name}</h2>
+          <p className="mt-1 flex items-center gap-1 text-xs text-stone-400">
+            <MapPin size={11} />
+            {salon.location}
+          </p>
+        </div>
+      </div>
+      <dl className="space-y-3 py-5 text-sm">
+        {[
+          ["Service", booking.service?.name],
+          ["Specialist", booking.specialist?.name],
+          [
+            "Date",
+            booking.date?.date.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }),
+          ],
+          ["Time", booking.time],
+          [
+            "Location",
+            booking.location === "home"
+              ? "Home Service"
+              : booking.location === "salon"
+                ? "At Salon"
+                : null,
+          ],
+        ].map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-4">
+            <dt className="text-stone-400">{k}</dt>
+            <dd
+              className={`text-right font-semibold ${v ? "text-ink" : "text-stone-300"}`}
+            >
+              {v || "Not selected"}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <div className="space-y-2 border-t border-stone-100 pt-4 text-sm">
+        <div className="flex justify-between">
+          <span className="text-stone-500">Service price</span>
+          <b>{booking.service ? money(booking.service.price) : "$0.00"}</b>
+        </div>
+        {fee > 0 && (
+          <div className="flex justify-between">
+            <span className="text-stone-500">Home service fee</span>
+            <b>{money(fee)}</b>
+          </div>
+        )}
+        <div className="flex justify-between pt-2 font-display text-xl font-bold">
+          <span>Total</span>
+          <span className="text-wine-700">{money(total)}</span>
+        </div>
+      </div>
+      <button
+        onClick={onConfirm}
+        disabled={!ready}
+        className="btn-primary mt-6 w-full rounded-xl disabled:cursor-not-allowed disabled:bg-stone-300 disabled:shadow-none"
+      >
+        <CalendarCheck size={17} />
+        Confirm Booking
+      </button>
+      {!ready && (
+        <p className="mt-3 text-center text-[11px] leading-4 text-stone-400">
+          Complete all required steps to confirm.
+        </p>
+      )}
+      <p className="mt-4 flex items-center justify-center gap-1.5 text-[10px] text-stone-400">
+        <ShieldCheck size={12} />
+        Your appointment details are protected
+      </p>
+    </aside>
+  );
+}
+export function BookingSuccessModal({ salon, booking, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-wine-900/60 p-4 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="success-title"
+        className="relative w-full max-w-md rounded-3xl bg-white p-7 text-center shadow-2xl"
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-5 top-5 text-stone-400"
+        >
+          <X size={18} />
+        </button>
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-600">
+          <CheckCircle2 size={30} />
+        </div>
+        <p className="mt-5 text-xs font-bold uppercase tracking-[.15em] text-wine-600">
+          Booking #{booking.saved?.booking_number || "AU-28491"}
+        </p>
+        <h2
+          id="success-title"
+          className="mt-2 font-display text-3xl font-bold tracking-[-.04em]"
+        >
+          Your appointment is confirmed!
+        </h2>
+        <div className="mt-6 rounded-xl bg-[#f7f2ec] p-4 text-left text-sm">
+          <p className="font-bold">{salon.name}</p>
+          <p className="mt-2 text-stone-500">
+            {booking.service.name} · {booking.specialist.name}
+          </p>
+          <p className="mt-1 text-stone-500">
+            {booking.date.date.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            at {booking.time}
+          </p>
+        </div>
+        <div className="mt-6 grid gap-2 sm:grid-cols-2">
+          <a href="/my-bookings" className="btn-primary rounded-xl px-4">
+            View My Bookings
+          </a>
+          <a href="/salons" className="btn-secondary rounded-xl px-4">
+            Discover Salons
+          </a>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
-export function BookingPage({id}){const salon=salons.find(x=>x.id===id)||salons[0];const {user}=useAuth();const [step,setStep]=useState(0);const [booking,setBooking]=useState({service:null,specialist:null,date:null,time:null,location:null,payment:null});const [address,setAddress]=useState({address:'',city:'',notes:''});const [success,setSuccess]=useState(false);const [savedBooking,setSavedBooking]=useState(null);const [saveError,setSaveError]=useState('');const [saving,setSaving]=useState(false);const complete=[!!booking.service,!!booking.specialist,!!booking.date&&!!booking.time,!!booking.location&&(booking.location!=='home'||!!address.address.trim()&&!!address.city.trim()),!!booking.payment,true];const ready=complete.slice(0,5).every(Boolean);const update=(key,value)=>setBooking(b=>({...b,[key]:value,...(key==='location'&&value==='salon'&&b.payment==='delivery'?{payment:null}:{})}));const next=()=>{if(complete[step])setStep(Math.min(step+1,5))};const confirm=async()=>{if(!ready||saving)return;setSaving(true);setSaveError('');try{const saved=await createBookingFromSelection({userId:user.id,salonSlug:salon.id,booking,address});setSavedBooking(saved);setSuccess(true)}catch(error){setSaveError(error?.message||'Unable to save your booking. Please try again.')}finally{setSaving(false)}};return <main className="min-h-screen bg-[#f7f2ec]"><header className="border-b border-wine-900/5 bg-white"><div className="wrap flex h-20 items-center justify-between"><a href="/" className="flex items-center gap-2.5 font-display text-2xl font-bold"><span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white"><Sparkles size={17}/></span>Aura</a><a href="/salons" className="btn-secondary px-4 py-2.5"><ArrowLeft size={15}/>Discover salons</a></div></header><div className="wrap py-8 sm:py-12"><div className="mb-8"><div className="eyebrow"><CalendarCheck size={13}/>Appointment booking</div><h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">Book {salon.name}</h1><p className="mt-3 text-stone-500">Choose what feels right. You can review every detail before confirming.</p></div><div className="mb-7 rounded-2xl bg-white p-4 shadow-sm sm:p-5"><BookingSteps current={step}/></div><div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]"><div className="rounded-2xl bg-white p-5 shadow-sm sm:p-7"><motion.div key={step} initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} transition={{duration:.25}}>{step===0&&<><StepHeader number="1" title="Select Service" copy="Choose one service for this appointment."/><ServiceSelector value={booking.service} onChange={v=>update('service',v)}/></>}{step===1&&<><StepHeader number="2" title="Choose Specialist" copy="Select an expert or let Aura find the best match."/><SpecialistSelector value={booking.specialist} onChange={v=>update('specialist',v)}/></>}{step===2&&<><StepHeader number="3" title="Select Date & Time" copy="Choose from the salon’s next available appointments."/><DateSelector value={booking.date} onChange={v=>{update('date',v);update('time',null)}}/><h3 className="mb-3 mt-7 text-sm font-bold">Available times</h3><TimeSelector value={booking.time} onChange={v=>update('time',v)}/></>}{step===3&&<><StepHeader number="4" title="Service Location" copy="Visit the salon or enjoy your service at home."/><LocationSelector value={booking.location} onChange={v=>update('location',v)} address={address} setAddress={setAddress}/></>}{step===4&&<><StepHeader number="5" title="Payment Method" copy="Select how you would like to pay for your appointment."/><PaymentSelector value={booking.payment} onChange={v=>update('payment',v)} home={booking.location==='home'}/></>}{step===5&&<div className="py-5 text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-wine-50 text-wine-700"><CheckCircle2 size={28}/></div><h2 className="mt-5 font-display text-3xl font-bold">Everything looks beautiful.</h2><p className="mx-auto mt-3 max-w-md leading-7 text-stone-500">Review your booking summary, then confirm your appointment. No payment will be charged in this mock experience.</p></div>}</motion.div><div className="mt-7 flex items-center justify-between border-t border-stone-100 pt-5"><button onClick={()=>setStep(Math.max(0,step-1))} disabled={step===0} className="btn-secondary px-5 py-3 disabled:invisible"><ArrowLeft size={16}/>Back</button>{step<5&&<div className="text-right"><button onClick={next} disabled={!complete[step]} className="btn-primary px-6 py-3 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:shadow-none">Continue<ArrowRight size={16}/></button>{!complete[step]&&<p className="mt-2 text-[10px] text-stone-400">Complete this step to continue</p>}</div>}</div></div><BookingSummary salon={salon} booking={booking} ready={ready&&!saving} onConfirm={confirm}/></div></div>{saveError&&<div role="alert" className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-red-700 px-5 py-3 text-sm font-bold text-white shadow-xl">{saveError}</div>}{success&&<BookingSuccessModal salon={salon} booking={{...booking,saved:savedBooking}} onClose={()=>setSuccess(false)}/>}</main>}
-function PlaceholderPage({icon:Icon,eyebrow,title,copy,image,primary}){return <main className="min-h-screen bg-cream px-5 py-8"><div className="mx-auto max-w-5xl"><a href="/salons" className="inline-flex items-center gap-2 text-sm font-bold text-wine-700"><ArrowLeft size={16}/>Back to salon discovery</a><div className="mt-8 grid overflow-hidden rounded-3xl bg-white shadow-soft md:grid-cols-2"><img src={image} alt="" className="h-72 w-full object-cover md:h-full"/><div className="flex flex-col justify-center p-8 sm:p-12"><div className="eyebrow"><Icon size={13}/>{eyebrow}</div><h1 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em]">{title}</h1><p className="mt-4 leading-7 text-stone-500">{copy}</p><div className="mt-8 rounded-xl bg-wine-50 p-4 text-sm text-wine-800"><b>Coming next:</b> This is a polished placeholder ready for backend and booking integration.</div><a href={primary.href} className="btn-primary mt-7 self-start">{primary.label}<ArrowRight size={16}/></a></div></div></div></main>}
+export function BookingPage({ id }) {
+  const salon = salons.find((x) => x.id === id) || salons[0];
+  const { user } = useAuth();
+  const initialSelection = useMemo(() => {
+    const params =
+      typeof window === "undefined"
+        ? new URLSearchParams()
+        : new URLSearchParams(window.location.search);
+    const serviceName = params.get("service");
+    const specialistName = params.get("specialist");
+    const service =
+      bookingServices.find((item) => item.name === serviceName) || null;
+    const specialist = specialistName
+      ? specialists.find((item) => item.name === specialistName) || {
+          id: `profile-${specialistName}`,
+          name: specialistName,
+        }
+      : null;
+    return {
+      service,
+      specialist,
+      home: params.get("home") === "true",
+    };
+  }, []);
+  const [step, setStep] = useState(initialSelection.service ? 1 : 0);
+  const [booking, setBooking] = useState({
+    service: initialSelection.service,
+    specialist: initialSelection.specialist,
+    date: null,
+    time: null,
+    location: initialSelection.home ? "home" : null,
+    payment: null,
+  });
+  const [address, setAddress] = useState({ address: "", city: "", notes: "" });
+  const [success, setSuccess] = useState(false);
+  const [savedBooking, setSavedBooking] = useState(null);
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const complete = [
+    !!booking.service,
+    !!booking.specialist,
+    !!booking.date && !!booking.time,
+    !!booking.location &&
+      (booking.location !== "home" ||
+        (!!address.address.trim() && !!address.city.trim())),
+    !!booking.payment,
+    true,
+  ];
+  const ready = complete.slice(0, 5).every(Boolean);
+  const update = (key, value) =>
+    setBooking((b) => ({
+      ...b,
+      [key]: value,
+      ...(key === "location" && value === "salon" && b.payment === "delivery"
+        ? { payment: null }
+        : {}),
+    }));
+  const next = () => {
+    if (complete[step]) setStep(Math.min(step + 1, 5));
+  };
+  const confirm = async () => {
+    if (!ready || saving) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const saved = await createBookingFromSelection({
+        userId: user.id,
+        salonSlug: salon.id,
+        booking,
+        address,
+      });
+      setSavedBooking(saved);
+      setSuccess(true);
+    } catch (error) {
+      setSaveError(
+        error?.message || "Unable to save your booking. Please try again.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <main className="min-h-screen bg-[#f7f2ec]">
+      <header className="border-b border-wine-900/5 bg-white">
+        <div className="wrap flex h-20 items-center justify-between">
+          <a
+            href="/"
+            className="flex items-center gap-2.5 font-display text-2xl font-bold"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-wine-700 text-white">
+              <Sparkles size={17} />
+            </span>
+            Aura
+          </a>
+          <a href="/salons" className="btn-secondary px-4 py-2.5">
+            <ArrowLeft size={15} />
+            Discover salons
+          </a>
+        </div>
+      </header>
+      <div className="wrap py-8 sm:py-12">
+        <div className="mb-8">
+          <div className="eyebrow">
+            <CalendarCheck size={13} />
+            Appointment booking
+          </div>
+          <h1 className="mt-5 font-display text-4xl font-semibold tracking-[-.045em] sm:text-5xl">
+            Book {salon.name}
+          </h1>
+          <p className="mt-3 text-stone-500">
+            Choose what feels right. You can review every detail before
+            confirming.
+          </p>
+        </div>
+        <div className="mb-7 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
+          <BookingSteps current={step} />
+        </div>
+        <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
+          <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              {step === 0 && (
+                <>
+                  <StepHeader
+                    number="1"
+                    title="Select Service"
+                    copy="Choose one service for this appointment."
+                  />
+                  <ServiceSelector
+                    value={booking.service}
+                    onChange={(v) => update("service", v)}
+                  />
+                </>
+              )}
+              {step === 1 && (
+                <>
+                  <StepHeader
+                    number="2"
+                    title="Choose Specialist"
+                    copy="Select an expert or let Aura find the best match."
+                  />
+                  <SpecialistSelector
+                    value={booking.specialist}
+                    onChange={(v) => update("specialist", v)}
+                  />
+                </>
+              )}
+              {step === 2 && (
+                <>
+                  <StepHeader
+                    number="3"
+                    title="Select Date & Time"
+                    copy="Choose from the salon’s next available appointments."
+                  />
+                  <DateSelector
+                    value={booking.date}
+                    onChange={(v) => {
+                      update("date", v);
+                      update("time", null);
+                    }}
+                  />
+                  <h3 className="mb-3 mt-7 text-sm font-bold">
+                    Available times
+                  </h3>
+                  <TimeSelector
+                    value={booking.time}
+                    onChange={(v) => update("time", v)}
+                  />
+                </>
+              )}
+              {step === 3 && (
+                <>
+                  <StepHeader
+                    number="4"
+                    title="Service Location"
+                    copy="Visit the salon or enjoy your service at home."
+                  />
+                  <LocationSelector
+                    value={booking.location}
+                    onChange={(v) => update("location", v)}
+                    address={address}
+                    setAddress={setAddress}
+                  />
+                </>
+              )}
+              {step === 4 && (
+                <>
+                  <StepHeader
+                    number="5"
+                    title="Payment Method"
+                    copy="Select how you would like to pay for your appointment."
+                  />
+                  <PaymentSelector
+                    value={booking.payment}
+                    onChange={(v) => update("payment", v)}
+                    home={booking.location === "home"}
+                  />
+                </>
+              )}
+              {step === 5 && (
+                <div className="py-5 text-center">
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-wine-50 text-wine-700">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <h2 className="mt-5 font-display text-3xl font-bold">
+                    Everything looks beautiful.
+                  </h2>
+                  <p className="mx-auto mt-3 max-w-md leading-7 text-stone-500">
+                    Review your booking summary, then confirm your appointment.
+                    No payment will be charged in this mock experience.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+            <div className="mt-7 flex items-center justify-between border-t border-stone-100 pt-5">
+              <button
+                onClick={() => setStep(Math.max(0, step - 1))}
+                disabled={step === 0}
+                className="btn-secondary px-5 py-3 disabled:invisible"
+              >
+                <ArrowLeft size={16} />
+                Back
+              </button>
+              {step < 5 && (
+                <div className="text-right">
+                  <button
+                    onClick={next}
+                    disabled={!complete[step]}
+                    className="btn-primary px-6 py-3 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:shadow-none"
+                  >
+                    Continue
+                    <ArrowRight size={16} />
+                  </button>
+                  {!complete[step] && (
+                    <p className="mt-2 text-[10px] text-stone-400">
+                      Complete this step to continue
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <BookingSummary
+            salon={salon}
+            booking={booking}
+            ready={ready && !saving}
+            onConfirm={confirm}
+          />
+        </div>
+      </div>
+      {saveError && (
+        <div
+          role="alert"
+          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-red-700 px-5 py-3 text-sm font-bold text-white shadow-xl"
+        >
+          {saveError}
+        </div>
+      )}
+      {success && (
+        <BookingSuccessModal
+          salon={salon}
+          booking={{ ...booking, saved: savedBooking }}
+          onClose={() => setSuccess(false)}
+        />
+      )}
+    </main>
+  );
+}
+function PlaceholderPage({ icon: Icon, eyebrow, title, copy, image, primary }) {
+  return (
+    <main className="min-h-screen bg-cream px-5 py-8">
+      <div className="mx-auto max-w-5xl">
+        <a
+          href="/salons"
+          className="inline-flex items-center gap-2 text-sm font-bold text-wine-700"
+        >
+          <ArrowLeft size={16} />
+          Back to salon discovery
+        </a>
+        <div className="mt-8 grid overflow-hidden rounded-3xl bg-white shadow-soft md:grid-cols-2">
+          <img
+            src={image}
+            alt=""
+            className="h-72 w-full object-cover md:h-full"
+          />
+          <div className="flex flex-col justify-center p-8 sm:p-12">
+            <div className="eyebrow">
+              <Icon size={13} />
+              {eyebrow}
+            </div>
+            <h1 className="mt-6 font-display text-4xl font-semibold tracking-[-.04em]">
+              {title}
+            </h1>
+            <p className="mt-4 leading-7 text-stone-500">{copy}</p>
+            <div className="mt-8 rounded-xl bg-wine-50 p-4 text-sm text-wine-800">
+              <b>Coming next:</b> This is a polished placeholder ready for
+              backend and booking integration.
+            </div>
+            <a href={primary.href} className="btn-primary mt-7 self-start">
+              {primary.label}
+              <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
