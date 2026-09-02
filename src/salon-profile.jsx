@@ -579,6 +579,7 @@ export function SalonProfilePage({ id }) {
   if (error || !salon) return <ProfileError message={error} />;
   const services = (salon.services || []).filter((x) => x.is_active !== false);
   const reviews = salon.reviews || [];
+  const salonProducts = (salon.products || []).filter((x) => x.is_active);
   const images = [salon.image_url, ...galleryFallback]
     .filter(Boolean)
     .slice(0, 5);
@@ -842,28 +843,42 @@ export function SalonProfilePage({ id }) {
                 title={`Products from ${salon.name}`}
               />
               <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                {products.map((product) => (
-                  <article key={product.name}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="aspect-square w-full rounded-2xl object-cover"
-                    />
-                    <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                      {product.brand}
-                    </p>
-                    <h3 className="mt-1 text-sm font-bold">{product.name}</h3>
-                    <p className="mt-2 flex items-center justify-between text-sm">
-                      <b className="text-wine-700">${product.price}</b>
-                      <span className="text-xs text-amber-700">
-                        ★ {product.rating}
-                      </span>
-                    </p>
-                    <button className="mt-3 w-full rounded-lg border border-wine-200 py-2 text-xs font-bold text-wine-700">
-                      View product
-                    </button>
-                  </article>
-                ))}
+                {(salonProducts.length ? salonProducts : products).map(
+                  (product) => (
+                    <article key={product.name}>
+                      <img
+                        src={product.image_urls?.[0] || product.image}
+                        alt={product.name}
+                        className="aspect-square w-full rounded-2xl object-cover"
+                      />
+                      <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                        {product.brand}
+                      </p>
+                      <h3 className="mt-1 text-sm font-bold">{product.name}</h3>
+                      <p className="mt-2 flex items-center justify-between text-sm">
+                        <b className="text-wine-700">
+                          $
+                          {Number(
+                            product.discount_price || product.price,
+                          ).toFixed(0)}
+                        </b>
+                        <span className="text-xs text-amber-700">
+                          ★ {product.rating || "New"}
+                        </span>
+                      </p>
+                      <a
+                        href={
+                          product.slug
+                            ? `/products/${product.slug}`
+                            : "/marketplace"
+                        }
+                        className="mt-3 block w-full rounded-lg border border-wine-200 py-2 text-center text-xs font-bold text-wine-700"
+                      >
+                        View product
+                      </a>
+                    </article>
+                  ),
+                )}
               </div>
             </section>
             <section className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">

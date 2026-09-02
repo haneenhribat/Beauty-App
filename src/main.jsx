@@ -12,6 +12,15 @@ import {
   NotificationsPage,
 } from "./dashboard.jsx";
 import { AdvancedSalonDiscoveryPage } from "./discovery.jsx";
+import {
+  AddressesPage,
+  CartPage,
+  CheckoutPage,
+  MarketplacePage,
+  MyOrdersPage,
+  ProductDetailsPage,
+  WishlistPage,
+} from "./marketplace.jsx";
 
 const nav = [
   ["Home", "home"],
@@ -47,7 +56,7 @@ const features = [
     I.ShoppingBag,
     "Beauty marketplace",
     "Shop handpicked products from brands and local salons.",
-    "#marketplace",
+    "/marketplace",
     "Explore products",
   ],
   [
@@ -666,7 +675,7 @@ function Marketplace() {
           </div>
           <a
             className="flex items-center gap-2 text-sm font-bold text-wine-700"
-            href="#contact"
+            href="/marketplace"
           >
             Shop all products <I.ArrowRight size={16} />
           </a>
@@ -1441,6 +1450,39 @@ export default function App() {
     return (
       <ProtectedRoute>
         <NotificationsPage />
+      </ProtectedRoute>
+    );
+  if (path === "/marketplace") return <MarketplacePage />;
+  if (path.startsWith("/products/"))
+    return <ProductDetailsPage slug={path.split("/")[2]} />;
+  if (path === "/cart")
+    return (
+      <ProtectedRoute>
+        <CartPage />
+      </ProtectedRoute>
+    );
+  if (path === "/checkout")
+    return (
+      <ProtectedRoute>
+        <CheckoutPage />
+      </ProtectedRoute>
+    );
+  if (path === "/wishlist")
+    return (
+      <ProtectedRoute>
+        <WishlistPage />
+      </ProtectedRoute>
+    );
+  if (path === "/addresses")
+    return (
+      <ProtectedRoute>
+        <AddressesPage />
+      </ProtectedRoute>
+    );
+  if (path === "/my-orders")
+    return (
+      <ProtectedRoute>
+        <MyOrdersPage />
       </ProtectedRoute>
     );
   if (path === "/salons") return <AdvancedSalonDiscoveryPage />;
