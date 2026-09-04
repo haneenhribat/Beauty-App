@@ -333,8 +333,38 @@ export async function assistantCancelBooking(bookingId) {
   return data;
 }
 
-export async function searchAvailableSlots(salonId, date, specialistId = null) {
-  const { data, error } = await requireClient().rpc("search_available_slots", { p_salon_id: salonId, p_date: date, p_specialist_id: specialistId });
+export async function searchAvailableSlots(salonId, serviceId, date, specialistId = null, after = null) {
+  const { data, error } = await requireClient().rpc("search_available_slots", { p_salon_id: salonId, p_service_id: serviceId, p_date: date, p_specialist_id: specialistId, p_after: after });
   if (error) throw error;
   return data;
+}
+
+export async function getCancellationQuote(bookingId) {
+  const { data, error } = await requireClient().rpc("get_booking_cancellation_quote", { p_booking_id: bookingId });
+  if (error) throw error;
+  return data?.[0] || null;
+}
+
+export async function getAssistantConversation(userId) {
+  const client = requireClient();
+  let { data: conversation, error } = await client.from("assistant_conversations").select("*").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  if (!conversation) {
+    const created = await client.from("assistant_conversations").insert({ user_id: userId }).select("*").single();
+    if (created.error) throw created.error;
+    conversation = created.data;
+  }
+  const messages = await client.from("assistant_messages").select("role,content,created_at").eq("conversation_id", conversation.id).order("created_at").limit(100);
+  if (messages.error) throw messages.error;
+  return { conversation, messages: messages.data };
+}
+
+export async function saveAssistantMessage(userId, conversationId, role, content, context = null) {
+  const client = requireClient();
+  const result = await client.from("assistant_messages").insert({ user_id: userId, conversation_id: conversationId, role, content });
+  if (result.error) throw result.error;
+  const values = { updated_at: new Date().toISOString() };
+  if (context) values.context = context;
+  const updated = await client.from("assistant_conversations").update(values).eq("id", conversationId).eq("user_id", userId);
+  if (updated.error) throw updated.error;
 }
