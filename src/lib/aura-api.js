@@ -302,3 +302,39 @@ export async function placeMarketplaceOrder(values) {
   if (error) throw error;
   return data;
 }
+
+export async function getAssistantCatalog() {
+  const client = requireClient();
+  const [salons, products, faq] = await Promise.all([
+    client.from("salons").select("*, services(*), specialists(*), reviews(rating)").eq("is_active", true),
+    client.from("products").select("*, category:product_categories(*), salon:salons(id,slug,name), reviews:product_reviews(rating)").eq("is_active", true),
+    client.from("platform_faq").select("*").order("topic"),
+  ]);
+  const failed = [salons, products, faq].find((result) => result.error);
+  if (failed) throw failed.error;
+  return { salons: salons.data, products: products.data, faq: faq.data };
+}
+
+export async function assistantCreateBooking(values) {
+  const { data, error } = await requireClient().rpc("ai_create_booking", values);
+  if (error) throw error;
+  return data;
+}
+
+export async function assistantRescheduleBooking(bookingId, appointmentAt) {
+  const { data, error } = await requireClient().rpc("ai_reschedule_booking", { p_booking_id: bookingId, p_appointment_at: appointmentAt });
+  if (error) throw error;
+  return data;
+}
+
+export async function assistantCancelBooking(bookingId) {
+  const { data, error } = await requireClient().rpc("ai_cancel_booking", { p_booking_id: bookingId });
+  if (error) throw error;
+  return data;
+}
+
+export async function searchAvailableSlots(salonId, date, specialistId = null) {
+  const { data, error } = await requireClient().rpc("search_available_slots", { p_salon_id: salonId, p_date: date, p_specialist_id: specialistId });
+  if (error) throw error;
+  return data;
+}

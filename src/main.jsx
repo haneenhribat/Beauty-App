@@ -21,6 +21,7 @@ import {
   ProductDetailsPage,
   WishlistPage,
 } from "./marketplace.jsx";
+import { AssistantPage } from "./assistant.jsx";
 
 const nav = [
   ["Home", "home"],
@@ -1485,6 +1486,7 @@ export default function App() {
         <MyOrdersPage />
       </ProtectedRoute>
     );
+  if (path === "/assistant") return <AssistantPage />;
   if (path === "/salons") return <AdvancedSalonDiscoveryPage />;
   if (path.startsWith("/salons/"))
     return <SalonDetailsPage id={path.split("/")[2]} />;
